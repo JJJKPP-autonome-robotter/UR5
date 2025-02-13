@@ -10,8 +10,11 @@ using namespace std::chrono;
 
 
 int main(int argc, char* argv[]){
+	std::cout << "Connecting to control" << std::endl;
 	RTDEControlInterface rtde_control("192.168.1.54");
+	std::cout << "Connecting to recieve" << std::endl;
 	RTDEReceiveInterface rtde_receive("192.168.1.54");
+	std::cout << "ALL Connections established!!" << std::endl;
 
 	double velocity = 0.5;
 	double acceleration = 0.5;
