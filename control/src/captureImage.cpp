@@ -5,6 +5,9 @@ CaptureImage::CaptureImage(int cameraIndex) {
     if (!cap.isOpened()) {
         cerr << "Error: Could not open camera." << endl;
     }
+
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
 }
 
 CaptureImage::~CaptureImage() {
