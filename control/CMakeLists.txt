@@ -15,6 +15,6 @@ find_package(OpenCV REQUIRED)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${HEADERS_DIR} ${OpenCV_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ur_rtde::rtde ${OpenCV_LIBS})
