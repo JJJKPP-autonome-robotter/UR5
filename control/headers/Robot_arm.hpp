@@ -32,6 +32,8 @@ public:
     double get_lookahead_time();
     double get_gain();
     vector<double> get_base_pos();
+    vector<double> get_ref_point_1();
+    vector<double> get_ref_point_2();
 
     // Setters
     void set_velocity(double);
@@ -40,6 +42,7 @@ public:
     void set_lookahead_time(double);
     void set_gain(double);
     void set_base_pos(vector<double>);
+    void set_ref_points(vector<double>, vector<double>);
 
 private:
     string ip;
@@ -49,8 +52,8 @@ private:
     double lookahead_time;
     double gain;
     vector<double> base_pos;
-    array<double, 3> ref_point_1;
-    array<double, 3> ref_point_2;
+    vector<double> ref_point_1;
+    vector<double> ref_point_2;
 
 };
 

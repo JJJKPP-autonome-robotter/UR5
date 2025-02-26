@@ -70,6 +70,11 @@ vector<double> Robot_arm::get_base_pos() {
     return base_pos;
 }
 
+vector<double> Robot_arm::get_ref_point_1() {
+    return ref_point_1;
+}
+
+
 
 // Setters
 void Robot_arm::set_velocity(double v) {
