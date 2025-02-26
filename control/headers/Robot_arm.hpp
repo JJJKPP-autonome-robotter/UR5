@@ -16,11 +16,12 @@ class Robot_arm
 public:
     Robot_arm();
     ~Robot_arm();
+    // Constructor param IP, Velocity, Accelerations, Frequency, Lookahead_time, gain, vector 6 joint agnles in rad
     Robot_arm(string, double, double, double, double, double, vector<double>);
 
     // Methods
-    void connect();
-    void place_ref_point();
+    void connect();// Connects to Robot arm
+    void place_ref_point(); // Places ref points
 
     // Getters
     double get_velocity();
