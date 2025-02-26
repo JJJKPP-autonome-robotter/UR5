@@ -19,6 +19,23 @@ public:
     Robot_arm(string, double, double, double, double, double, vector<double>);
 
     void connect();
+    void place_ref_point();
+
+    // Getters
+    double get_velocity();
+    double get_acceleration();
+    double get_dt();
+    double get_lookahead_time();
+    double get_gain();
+    vector<double> get_base_pos();
+
+    // Setters
+    void set_velocity(double);
+    void set_acceleration(double);
+    void set_dt(double);
+    void set_lookahead_time(double);
+    void set_gain(double);
+    void set_base_pos(vector<double>)
 
 private:
     string ip;
