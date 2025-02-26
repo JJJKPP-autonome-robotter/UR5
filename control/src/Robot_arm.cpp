@@ -35,7 +35,10 @@ void Robot_arm::connect() {
 // Place reference points
 void Robot_arm::validate_ref_point() {
     // Go to ref point one
-    rtde_control->moveL(ref_point_1);
+    vector<double> hover_ref = ref_point_1;
+    hover_ref[3] += 0.1;
+    rtde_control->moveL(hover_ref); // Hover over ref point 1
+    rtde_control->moveL(ref_point_1); // Go down and touch
 
     // Wait for confirm
     // If not update ref coordinates
@@ -45,8 +48,14 @@ void Robot_arm::validate_ref_point() {
         // Update ref point
     }
 
-    // go to ref point two
-    rtde_control->moveL(ref_point_1);
+    rtde_control->moveL(hover_ref); // Hover over ref point 1
+
+
+    // Go to ref point two
+    hover_ref = ref_point_2;
+    hover_ref[3] += 0.1;
+    rtde_control->moveL(hover_ref); // Hover over ref point 2
+    rtde_control->moveL(ref_point_1); // Go down and touch
 
     // Wait for confitm
     // If not update ref coordinates
@@ -54,6 +63,8 @@ void Robot_arm::validate_ref_point() {
     if (confirm == 0) {
         // Update ref point
     }
+
+    rtde_control->moveL(hover_ref); // Hover over ref point 2
 }
 
 // Getters
