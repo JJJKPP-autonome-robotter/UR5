@@ -1,8 +1,8 @@
 #include "../headers/Robot_arm.hpp"
 
-Robot_arm::Robot_arm(){}
+Robot_arm::Robot_arm() {}
 
-Robot_arm::~Robot_arm(){}
+Robot_arm::~Robot_arm() {}
 
 // Constructor params IP of robot, velocity, acceleration, frequency, lookahead_time, gain, vecotr of 6 with anlge in rad for each joint
 Robot_arm::Robot_arm(string _ip, double _velocity, double _acceleration, double _dt, double _lookahead_time, double _gain, vector<double> _base_pos){
@@ -16,7 +16,7 @@ Robot_arm::Robot_arm(string _ip, double _velocity, double _acceleration, double 
 }
 
 // Connect to UR robot arm
-void Robot_arm::connect(){
+void Robot_arm::connect() {
     // Connects to control interface
     cout << "Connecting to robot control interface: ";
     ur_rtde::RTDEControlInterface rtde_control(ip);
@@ -32,54 +32,67 @@ void Robot_arm::connect(){
     rtde_control.moveJ(base_pos, velocity, acceleration);
 }
 
+// Place reference points
+void validate_ref_point() {
+    // Go to ref point one
+    
+
+    // Wait for confirm
+    // If not update ref coordinates
+
+    // go to ref point two
+    // Wait for confitm
+    // If not update ref coordinates
+}
+
 // Getters
-double Robot_arm::get_velocity(){
+double Robot_arm::get_velocity() {
     return velocity;
 }
 
-double Robot_arm::get_acceleration(){
+double Robot_arm::get_acceleration() {
     return acceleration;
 }
 
-double Robot_arm::get_dt(){
+double Robot_arm::get_dt() {
     return dt;
 }
 
-double Robot_arm::get_lookahead_time(){
+double Robot_arm::get_lookahead_time() {
     return lookahead_time;
 }
 
-double Robot_arm::get_gain(){
+double Robot_arm::get_gain() {
     return gain;
 }
 
-vector<double> Robot_arm::get_base_pos(){
+vector<double> Robot_arm::get_base_pos() {
     return base_pos;
 }
 
 
 // Setters
-void Robot_arm::set_velocity(double v){
+void Robot_arm::set_velocity(double v) {
     velocity = v;
 }
 
-void Robot_arm::set_acceleration(double a){
+void Robot_arm::set_acceleration(double a) {
     acceleration = a;
 }
 
-void Robot_arm::set_dt(double _dt){
+void Robot_arm::set_dt(double _dt) {
     dt = _dt;
 }
 
-void Robot_arm::set_lookahead_time(double lat){
+void Robot_arm::set_lookahead_time(double lat) {
     lookahead_time = lat;
 }
 
-void Robot_arm::set_gain(double g){
+void Robot_arm::set_gain(double g) {
     gain = g;
 }
 
-void Robot_arm::set_base_pos(vector<double> bp){
+void Robot_arm::set_base_pos(vector<double> bp) {
     base_pos = bp;
 }
 

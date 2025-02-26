@@ -2,10 +2,12 @@
 
 #include <iostream>
 #include <string>
+#include <array>
+#include <vector>
 
 using namespace std;
 
-int main(){
+int main() {
 	string ip = "192.168.1.54";
 	double velocity = 0.25; // Standart velocity
     double acceleration = 0.25; // Standart acceleration
@@ -17,6 +19,11 @@ int main(){
 	// Init robot and connect
 	Robot_arm ur5 = Robot_arm(ip, velocity, acceleration, dt, lookahead_time, gain, base_pos);
 	ur5.connect();
+
+	// Refpoints
+	array<double, 3> ref_point_1 = {5, 5, 5};
+	array<double, 3> ref_point_2 = {5, 10, 5};
+	ur5.set_ref_points(ref_point_1, ref_point_2);
 
 	// Launch GUI, take user input
 	

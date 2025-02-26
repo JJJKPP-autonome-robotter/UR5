@@ -8,6 +8,8 @@
 #include <thread>
 #include <chrono>
 #include <string>
+#include <vector>
+#include <array>
 
 using namespace std;
 
@@ -21,7 +23,7 @@ public:
 
     // Methods
     void connect();// Connects to Robot arm
-    void place_ref_point(); // Places ref points
+    void validate_ref_point(); // Validate refpoints, vector3 coordiantes to points
 
     // Getters
     double get_velocity();
@@ -47,6 +49,8 @@ private:
     double lookahead_time;
     double gain;
     vector<double> base_pos;
+    array<double, 3> ref_point_1;
+    array<double, 3> ref_point_2;
 
 };
 
