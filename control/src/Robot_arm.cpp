@@ -46,27 +46,33 @@ void validate_ref_point() {
 }
 
 // Getters
-double Robot_arm::get_velocity() {
+// Gets double velocity and returns double velocity
+double Robot_arm::get_velocity(){
     return velocity;
 }
 
-double Robot_arm::get_acceleration() {
+// Gets double acceleration and returns double accelertation
+double Robot_arm::get_acceleration(){
     return acceleration;
 }
 
-double Robot_arm::get_dt() {
+// Gets double dt and returns double dt
+double Robot_arm::get_dt(){
     return dt;
 }
 
-double Robot_arm::get_lookahead_time() {
+// Gets double lookahead_time and returns double lookahead_time
+double Robot_arm::get_lookahead_time(){
     return lookahead_time;
 }
 
-double Robot_arm::get_gain() {
+// Gets double gain and returns double gain
+double Robot_arm::get_gain(){
     return gain;
 }
 
-vector<double> Robot_arm::get_base_pos() {
+// Gets vector (6 elements: joint angles in rads) double base_pos and returns vector (6 elements: joint angles in rads) double base_pos 
+vector<double> Robot_arm::get_base_pos(){
     return base_pos;
 }
 
@@ -77,27 +83,33 @@ vector<double> Robot_arm::get_ref_point_1() {
 
 
 // Setters
-void Robot_arm::set_velocity(double v) {
+// Sets velocity in Robot_arm to the variable "v"
+void Robot_arm::set_velocity(double v){
     velocity = v;
 }
 
-void Robot_arm::set_acceleration(double a) {
+// Sets acceleration in Robot_arm to the variable "a"
+void Robot_arm::set_acceleration(double a){
     acceleration = a;
 }
 
-void Robot_arm::set_dt(double _dt) {
+// Sets dt in Robot_arm to the variable "_dt"
+void Robot_arm::set_dt(double _dt){
     dt = _dt;
 }
 
-void Robot_arm::set_lookahead_time(double lat) {
+// Sets lookahead_time in Robot_arm to the variable "lat"
+void Robot_arm::set_lookahead_time(double lat){
     lookahead_time = lat;
 }
 
-void Robot_arm::set_gain(double g) {
+// Sets gain in Robot_arm to the variable "g"
+void Robot_arm::set_gain(double g){
     gain = g;
 }
 
-void Robot_arm::set_base_pos(vector<double> bp) {
+// Sets base_pos in Robot_arm to the variable "bp"
+void Robot_arm::set_base_pos(vector<double> bp){
     base_pos = bp;
 }
 
