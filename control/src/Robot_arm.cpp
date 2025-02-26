@@ -28,52 +28,64 @@ void Robot_arm::connect(){
 }
 
 // Getters
+// Gets double velocity and returns double velocity
 double Robot_arm::get_velocity(){
     return velocity;
 }
 
+// Gets double acceleration and returns double accelertation
 double Robot_arm::get_acceleration(){
     return acceleration;
 }
 
+// Gets double dt and returns double dt
 double Robot_arm::get_dt(){
     return dt;
 }
 
+// Gets double lookahead_time and returns double lookahead_time
 double Robot_arm::get_lookahead_time(){
     return lookahead_time;
 }
 
+// Gets double gain and returns double gain
 double Robot_arm::get_gain(){
     return gain;
 }
 
+// Gets vector (6 elements: joint angles in rads) double base_pos and returns vector (6 elements: joint angles in rads) double base_pos 
 vector<double> Robot_arm::get_base_pos(){
     return base_pos;
 }
 
 
 // Setters
+// Sets velocity in Robot_arm to the variable "v"
 void Robot_arm::set_velocity(double v){
     velocity = v;
 }
 
+// Sets acceleration in Robot_arm to the variable "a"
 void Robot_arm::set_acceleration(double a){
     acceleration = a;
 }
 
+// Sets dt in Robot_arm to the variable "_dt"
 void Robot_arm::set_dt(double _dt){
     dt = _dt;
 }
 
+// Sets lookahead_time in Robot_arm to the variable "lat"
 void Robot_arm::set_lookahead_time(double lat){
     lookahead_time = lat;
 }
 
+// Sets gain in Robot_arm to the variable "g"
 void Robot_arm::set_gain(double g){
     gain = g;
 }
 
+// Sets base_pos in Robot_arm to the variable "bp"
 void Robot_arm::set_base_pos(vector<double> bp){
     base_pos = bp;
 }
