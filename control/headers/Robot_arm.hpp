@@ -35,7 +35,7 @@ public:
     void set_dt(double);
     void set_lookahead_time(double);
     void set_gain(double);
-    void set_base_pos(vector<double>)
+    void set_base_pos(vector<double>);
 
 private:
     string ip;
