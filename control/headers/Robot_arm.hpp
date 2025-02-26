@@ -18,6 +18,7 @@ public:
     ~Robot_arm();
     Robot_arm(string, double, double, double, double, double, vector<double>);
 
+    // Methods
     void connect();
     void place_ref_point();
 
