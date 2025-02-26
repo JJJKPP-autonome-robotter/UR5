@@ -76,10 +76,15 @@ vector<double> Robot_arm::get_base_pos(){
     return base_pos;
 }
 
-vector<double> Robot_arm::get_ref_point_1() {
+// Gets vector (6 element: joint angles in rads) double and returns vector (6 element: joint angles in rads) double
+vector<double> Robot_arm::get_ref_point_1(){
     return ref_point_1;
 }
 
+// Gets vector (6 element: joint angles in rads) double and returns vector (6 element: joint angles in rads) double
+vector<double> Robot_arm::get_ref_point_2(){
+    return ref_point_2;
+}
 
 
 // Setters
@@ -113,3 +118,8 @@ void Robot_arm::set_base_pos(vector<double> bp){
     base_pos = bp;
 }
 
+// Sets ref_point_1 to variable ref1, and ref_point_2 to ref2
+void Robot_arm::set_ref_points(vector<double> ref1, vector<double> ref2){
+    ref_point_1 = ref1;
+    ref_point_2 = ref2;
+}
