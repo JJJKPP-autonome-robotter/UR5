@@ -26,3 +26,55 @@ void Robot_arm::connect(){
     cout << "Moving to base position" << endl;
     rtde_control.moveJ(base_pos, velocity, acceleration);
 }
+
+// Getters
+double Robot_arm::get_velocity(){
+    return velocity;
+}
+
+double Robot_arm::get_acceleration(){
+    return acceleration;
+}
+
+double Robot_arm::get_dt(){
+    return dt;
+}
+
+double Robot_arm::get_lookahead_time(){
+    return lookahead_time;
+}
+
+double Robot_arm::get_gain(){
+    return gain;
+}
+
+vector<double> Robot_arm::get_base_pos(){
+    return base_pos;
+}
+
+
+// Setters
+void Robot_arm::set_velocity(double v){
+    velocity = v;
+}
+
+void Robot_arm::set_acceleration(double a){
+    acceleration = a;
+}
+
+void Robot_arm::set_dt(double _dt){
+    dt = _dt;
+}
+
+void Robot_arm::set_lookahead_time(double lat){
+    lookahead_time = lat;
+}
+
+void Robot_arm::set_gain(double g){
+    gain = g;
+}
+
+void Robot_arm::set_base_pos(vector<double> bp){
+    base_pos = bp;
+}
+
