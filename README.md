@@ -8,6 +8,19 @@ Guid to setting up the robot and needed librarys.<br>
 Install the RTDE library for C++ By Anders Prier Lindvig.<br>
 Library and guid at for installation at [RTDE library.](https://gitlab.com/sdurobotics/ur_rtde)<br>
 
+### OpenCV Library
+Install OpenCV Development Package: <br>
+    ```bash
+    sudo apt install libopencv-dev
+    ```
+#### Verification
+
+To verify the installation, run<br>
+```bash
+pkg-config --modversion opencv4
+```
+
+
 ### Robot setup
 To control the robot over Ethernet. Make sure to install the URCap External Control.<br>
 For installation guid see the [URCap installtion.](https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/blob/master/ur_robot_driver/doc/install_urcap_e_series.md)<br>
