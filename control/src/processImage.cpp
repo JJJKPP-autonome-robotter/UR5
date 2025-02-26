@@ -27,10 +27,16 @@ void ProcessImage::findContours() {
     vector<Vec4i> hierarchy;
     cv::findContours(mask, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
-    // Draw bounding boxes around detected red M&Ms
+    // Draw circles around detected red M&Ms with radius between 4 and 8
     for (const auto& contour : contours) {
-        Rect boundingBox = boundingRect(contour);
-        rectangle(output, boundingBox, Scalar(0, 255, 0), 2);
+        Point2f center;
+        float radius;
+        minEnclosingCircle(contour, center, radius);
+
+        // Only draw circles if the radius is within the desired range
+        if (radius >= 4.0 && radius <= 8.0) {
+            circle(output, center, static_cast<int>(radius), Scalar(0, 255, 0), 2);
+        }
     }
 }
 

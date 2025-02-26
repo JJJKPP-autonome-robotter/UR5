@@ -9,18 +9,18 @@ using namespace std;
 using namespace cv;
 
 class ProcessImage {
-public:
-    ProcessImage(const string& imagePath);
-    void detectRedMMS();
-    void showResults();
+  public:
+      ProcessImage(const string& imagePath);
+      void detectRedMMS();
+      void showResults();
 
-private:
-    Mat image;
-    Mat mask;
-    Mat output;
+  private:
+      Mat image;
+      Mat mask;
+      Mat output;
 
-    void preprocess();
-    void findContours();
+      void preprocess();
+      void findContours();
 };
 
 #endif // PROCESSIMAGE_HPP
