@@ -18,12 +18,12 @@ Robot_arm::Robot_arm(string _ip, double _velocity, double _acceleration, double 
 // Connect to UR robot arm
 void Robot_arm::connect() {
     // Connects to control interface
-    cout << "Connecting to robot control interface: ";
+    cout << "Connecting to robot control interface: " << endl;
     rtde_control = new ur_rtde::RTDEControlInterface(ip);
     cout << "SUCCES" << endl;
 
     // Connects to recieve interface
-    cout << "Connecting to robot receive interface: ";
+    cout << "Connecting to robot receive interface: " << endl;
     rtde_receive = new ur_rtde::RTDEReceiveInterface(ip);
     cout << "SUCCES" << endl;
 
