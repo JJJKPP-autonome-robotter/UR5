@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(HEADERS_DIR "${CMAKE_SOURCE_DIR}/headers")
 
-file(GLOB_RECURSE SOURCES "${SRC_DIR/*.cpp")
+file(GLOB_RECURSE SOURCES "${SRC_DIR}/*.cpp")
 
 find_package(ur_rtde REQUIRED)
 
