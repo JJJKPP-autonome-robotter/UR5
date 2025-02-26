@@ -19,30 +19,41 @@ Robot_arm::Robot_arm(string _ip, double _velocity, double _acceleration, double 
 void Robot_arm::connect() {
     // Connects to control interface
     cout << "Connecting to robot control interface: ";
-    ur_rtde::RTDEControlInterface rtde_control(ip);
+    rtde_control = new ur_rtde::RTDEControlInterface(ip);
     cout << "SUCCES" << endl;
 
     // Connects to recieve interface
     cout << "Connecting to robot receive interface: ";
-    ur_rtde::RTDEReceiveInterface rtde_receive(ip);
+    rtde_receive = new ur_rtde::RTDEReceiveInterface(ip);
     cout << "SUCCES" << endl;
 
     // Moves robot to base position
     cout << "Moving to base position" << endl;
-    rtde_control.moveJ(base_pos, velocity, acceleration);
+    rtde_control->moveJ(base_pos, velocity, acceleration);
 }
 
 // Place reference points
-void validate_ref_point() {
+void Robot_arm::validate_ref_point() {
     // Go to ref point one
-    
+    rtde_control->moveL(ref_point_1);
 
     // Wait for confirm
     // If not update ref coordinates
+    int confirm;
+    cin >> confirm;
+    if (confirm == 0) {
+        // Update ref point
+    }
 
     // go to ref point two
+    rtde_control->moveL(ref_point_1);
+
     // Wait for confitm
     // If not update ref coordinates
+    cin >> confirm;
+    if (confirm == 0) {
+        // Update ref point
+    }
 }
 
 // Getters

@@ -21,8 +21,8 @@ int main() {
 	ur5.connect();
 
 	// Refpoints
-	array<double, 3> ref_point_1 = {5, 5, 5};
-	array<double, 3> ref_point_2 = {5, 10, 5};
+	vector<double> ref_point_1 = {5, 5, 5, 0, 0, 0};
+	vector<double> ref_point_2 = {5, 10, 5, 0, 0, 0};
 	ur5.set_ref_points(ref_point_1, ref_point_2);
 
 	// Launch GUI, take user input

@@ -45,6 +45,8 @@ public:
     void set_ref_points(vector<double>, vector<double>);
 
 private:
+    ur_rtde::RTDEControlInterface* rtde_control = nullptr;
+    ur_rtde::RTDEReceiveInterface* rtde_receive = nullptr;
     string ip;
     double velocity;
     double acceleration;
