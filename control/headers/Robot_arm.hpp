@@ -23,39 +23,47 @@ public:
 
     // Methods
     void connect();// Connects to Robot arm
-    void validate_ref_point(); // Validate refpoints, vector3 coordiantes to points
+    void validate_ref_points(); // Validate refpoints
 
     // Getters
-    double get_velocity();
-    double get_acceleration();
-    double get_dt();
-    double get_lookahead_time();
-    double get_gain();
-    vector<double> get_base_pos();
-    vector<double> get_ref_point_1();
-    vector<double> get_ref_point_2();
+    double get_velocity(); // Velocity double
+    double get_acceleration(); // Acceleration double
+    double get_dt(); // Frequency double
+    double get_lookahead_time(); // Lookahead_time double
+    double get_gain(); // Gain double
+    vector<double> get_base_pos(); // Base pos vector<double> {x, y, z, rx, ry, rz}
+    vector<double> get_ref_point_1(); // Ref point 1 vector<double> {x, y, z, rx, ry, rz}
+    vector<double> get_ref_point_2(); // Ref point 2 vector<double> {x, y, z, rx, ry, rz}
 
     // Setters
-    void set_velocity(double);
-    void set_acceleration(double);
-    void set_dt(double);
-    void set_lookahead_time(double);
-    void set_gain(double);
-    void set_base_pos(vector<double>);
-    void set_ref_points(vector<double>, vector<double>);
+    void set_velocity(double); // Velocity double
+    void set_acceleration(double); // Acceleration double
+    void set_dt(double); // Frequency double
+    void set_lookahead_time(double); // Lookahead_time double
+    void set_gain(double); // Gain double
+    void set_base_pos(vector<double>); // Base pos vector<double> {x, y, z, rx, ry, rz}
+    void set_ref_points(vector<double>, vector<double>); // Ref points vector<double> {x, y, z, rx, ry, rz}
 
 private:
+    // Robot specific objects and variables
     ur_rtde::RTDEControlInterface* rtde_control = nullptr;
     ur_rtde::RTDEReceiveInterface* rtde_receive = nullptr;
     string ip;
+
+    // Movement variables
     double velocity;
     double acceleration;
     double dt;
     double lookahead_time;
     double gain;
+
+    // Stadnart positions
     vector<double> base_pos;
     vector<double> ref_point_1;
     vector<double> ref_point_2;
+
+    // Privately used functions
+    void confirm_ref_point(vector<double>&);
 
 };
 

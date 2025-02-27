@@ -25,6 +25,8 @@ int main() {
 	vector<double> ref_point_2 = {5, 10, 5, 0, 0, 0};
 	ur5.set_ref_points(ref_point_1, ref_point_2);
 
+	ur5.validate_ref_points();
+
 	// Launch GUI, take user input
 	
 	// Function to calibrate robot

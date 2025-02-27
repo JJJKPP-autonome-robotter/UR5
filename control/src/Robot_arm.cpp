@@ -33,38 +33,52 @@ void Robot_arm::connect() {
 }
 
 // Place reference points
-void Robot_arm::validate_ref_point() {
+void Robot_arm::validate_ref_points() {
     // Go to ref point one
     vector<double> hover_ref = ref_point_1;
-    hover_ref[3] += 0.1;
+    hover_ref[3] += 0.1; // Add 10cm to z-axis
     rtde_control->moveL(hover_ref); // Hover over ref point 1
     rtde_control->moveL(ref_point_1); // Go down and touch
 
     // Wait for confirm
     // If not update ref coordinates
-    int confirm;
-    cin >> confirm;
-    if (confirm == 0) {
-        // Update ref point
-    }
-
+    confirm_ref_point(ref_point_1);
     rtde_control->moveL(hover_ref); // Hover over ref point 1
 
 
     // Go to ref point two
     hover_ref = ref_point_2;
-    hover_ref[3] += 0.1;
+    hover_ref[3] += 0.1; // Add 10cm to z-axis
     rtde_control->moveL(hover_ref); // Hover over ref point 2
     rtde_control->moveL(ref_point_1); // Go down and touch
 
     // Wait for confitm
     // If not update ref coordinates
-    cin >> confirm;
-    if (confirm == 0) {
-        // Update ref point
-    }
-
+    confirm_ref_point(ref_point_2);
     rtde_control->moveL(hover_ref); // Hover over ref point 2
+}
+
+void Robot_arm::confirm_ref_point(vector<double>& ref_point) {
+    char in;
+    cout << "Is tool on ref center y/n: ";
+    cin >> in;
+    if (in == 'n') {
+        rtde_control->freedriveMode(); // Enter freeDrive mode
+        cout << "is tool on ref point y/n: ";
+        cin >> in;
+        if (in == 'y') {
+            rtde_control->endFreedriveMode();
+            vector<double> new_ref_point = rtde_receive->getTargetTCPPose();
+            ref_point = new_ref_point;
+
+            // Print out new ref point
+            cout << "New ref point is: ";
+            for (auto i: new_ref_point) cout << i << ", ";
+            cout << endl;   
+        }
+        
+        
+    }
 }
 
 // Getters
