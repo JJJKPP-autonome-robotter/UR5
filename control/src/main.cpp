@@ -8,8 +8,8 @@
 using namespace std;
 
 int main() {
-	string ip = "192.168.1.54";
-	double velocity = 0.25; // Standart velocity
+    string ip = "192.168.0.133";
+    double velocity = 0.25; // Standart velocity
     double acceleration = 0.25; // Standart acceleration
     double dt = 1.0/500; // Standart update rate
     double lookahead_time = 0.1; // Standart lookahead time
@@ -21,8 +21,8 @@ int main() {
 	ur5.connect();
 
 	// Refpoints
-	vector<double> ref_point_1 = {5, 5, 5, 0, 0, 0};
-	vector<double> ref_point_2 = {5, 10, 5, 0, 0, 0};
+	vector<double> ref_point_1 = {0.2, 0.2, 0.2, 0, 3.14, 0};
+	vector<double> ref_point_2 = {0.3, 0.3, 0.2, 0, 3.14, 0};
 	ur5.set_ref_points(ref_point_1, ref_point_2);
 
 	ur5.validate_ref_points();

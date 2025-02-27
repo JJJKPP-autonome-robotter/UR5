@@ -50,7 +50,7 @@ void Robot_arm::validate_ref_points() {
     hover_ref = ref_point_2;
     hover_ref[3] += 0.1; // Add 10cm to z-axis
     rtde_control->moveL(hover_ref); // Hover over ref point 2
-    rtde_control->moveL(ref_point_1); // Go down and touch
+    rtde_control->moveL(ref_point_2); // Go down and touch
 
     // Wait for confitm
     // If not update ref coordinates
@@ -76,8 +76,6 @@ void Robot_arm::confirm_point(vector<double>& ref_point) {
             for (auto i: new_ref_point) cout << i << ", ";
             cout << endl;   
         }
-
-        
     }
 }
 
