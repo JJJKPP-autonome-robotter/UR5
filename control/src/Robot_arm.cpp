@@ -42,7 +42,7 @@ void Robot_arm::validate_ref_points() {
 
     // Wait for confirm
     // If not update ref coordinates
-    confirm_ref_point(ref_point_1);
+    confirm_point(ref_point_1);
     rtde_control->moveL(hover_ref); // Hover over ref point 1
 
 
@@ -54,17 +54,17 @@ void Robot_arm::validate_ref_points() {
 
     // Wait for confitm
     // If not update ref coordinates
-    confirm_ref_point(ref_point_2);
+    confirm_point(ref_point_2);
     rtde_control->moveL(hover_ref); // Hover over ref point 2
 }
 
-void Robot_arm::confirm_ref_point(vector<double>& ref_point) {
+void Robot_arm::confirm_point(vector<double>& ref_point) {
     char in;
-    cout << "Is tool on ref center y/n: ";
+    cout << "Is tool on point y/n: ";
     cin >> in;
     if (in == 'n') {
         rtde_control->freedriveMode(); // Enter freeDrive mode
-        cout << "is tool on ref point y/n: ";
+        cout << "is tool on point y/n: ";
         cin >> in;
         if (in == 'y') {
             rtde_control->endFreedriveMode();
@@ -72,11 +72,11 @@ void Robot_arm::confirm_ref_point(vector<double>& ref_point) {
             ref_point = new_ref_point;
 
             // Print out new ref point
-            cout << "New ref point is: ";
+            cout << "New point is: ";
             for (auto i: new_ref_point) cout << i << ", ";
             cout << endl;   
         }
-        
+
         
     }
 }
