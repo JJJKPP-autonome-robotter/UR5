@@ -48,6 +48,7 @@ private:
     // Robot specific objects and variables
     ur_rtde::RTDEControlInterface* rtde_control = nullptr;
     ur_rtde::RTDEReceiveInterface* rtde_receive = nullptr;
+    chrono::steady_clock::time_point t_start;
     string ip;
 
     // Movement variables

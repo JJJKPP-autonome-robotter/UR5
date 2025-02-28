@@ -34,28 +34,50 @@ void Robot_arm::connect() {
 
 // Place reference points
 void Robot_arm::validate_ref_points() {
-    // Go to ref point one
+    // Get hover over ref point 1
     vector<double> hover_ref = ref_point_1;
     hover_ref[3] += 0.3; // Add 10cm to z-axis
-    rtde_control->moveL(hover_ref); // Hover over ref point 1
+
+    // Hover over ref point 1
+    t_start = rtde_control->initPeriod();
+    rtde_control->moveL(hover_ref);
+    rtde_control->waitPeriod(t_start);
+
+    t_start = rtde_control->initPeriod();
     rtde_control->moveL(ref_point_1); // Go down and touch
+    rtde_control->waitPeriod(t_start);
 
     // Wait for confirm
     // If not update ref coordinates
     confirm_point(ref_point_1);
+
+    t_start = rtde_control->initPeriod();
     rtde_control->moveL(hover_ref); // Hover over ref point 1
+    rtde_control->waitPeriod(t_start);
 
 
-    // Go to ref point two
+    // Get hover over ref point 2
     hover_ref = ref_point_2;
     hover_ref[3] += 0.3; // Add 10cm to z-axis
-    rtde_control->moveL(hover_ref); // Hover over ref point 2
-    rtde_control->moveL(ref_point_2); // Go down and touch
+
+    // Hover over ref point 2
+    t_start = rtde_control->initPeriod();
+    rtde_control->moveL(hover_ref); 
+    rtde_control->waitPeriod(t_start);
+
+    // Go down and touch
+    t_start = rtde_control->initPeriod();
+    rtde_control->moveL(ref_point_2); 
+    rtde_control->waitPeriod(t_start);
 
     // Wait for confitm
     // If not update ref coordinates
     confirm_point(ref_point_2);
-    rtde_control->moveL(hover_ref); // Hover over ref point 2
+
+    // Hover over ref point 2
+    t_start = rtde_control->initPeriod();
+    rtde_control->moveL(hover_ref); 
+    rtde_control->waitPeriod(t_start);
 }
 
 void Robot_arm::confirm_point(vector<double>& ref_point) {
@@ -63,11 +85,18 @@ void Robot_arm::confirm_point(vector<double>& ref_point) {
     cout << "Is tool on point y/n: ";
     cin >> in;
     if (in == 'n') {
-        rtde_control->freedriveMode(); // Enter freeDrive mode
+        // Enter freedrive mode
+        while (!rtde_control->freedriveMode(vector<int32_t> {1, 1, 1, 1, 1, 1})) {
+            rtde_control->freedriveMode(vector<int32_t> {1, 1, 1, 1, 1, 1});
+        } 
         cout << "is tool on point y/n: ";
         cin >> in;
         if (in == 'y') {
-            rtde_control->endFreedriveMode();
+            // Exit freedrive mode
+            while (!rtde_control->endFreedriveMode()) {
+                rtde_control->endFreedriveMode();
+            }
+            
             vector<double> new_ref_point = rtde_receive->getTargetTCPPose();
             ref_point = new_ref_point;
 
