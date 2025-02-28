@@ -36,7 +36,7 @@ void Robot_arm::connect() {
 void Robot_arm::validate_ref_points() {
     // Go to ref point one
     vector<double> hover_ref = ref_point_1;
-    hover_ref[3] += 0.1; // Add 10cm to z-axis
+    hover_ref[3] += 0.3; // Add 10cm to z-axis
     rtde_control->moveL(hover_ref); // Hover over ref point 1
     rtde_control->moveL(ref_point_1); // Go down and touch
 
@@ -48,7 +48,7 @@ void Robot_arm::validate_ref_points() {
 
     // Go to ref point two
     hover_ref = ref_point_2;
-    hover_ref[3] += 0.1; // Add 10cm to z-axis
+    hover_ref[3] += 0.3; // Add 10cm to z-axis
     rtde_control->moveL(hover_ref); // Hover over ref point 2
     rtde_control->moveL(ref_point_2); // Go down and touch
 
