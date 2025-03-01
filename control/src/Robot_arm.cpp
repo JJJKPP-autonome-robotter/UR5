@@ -29,7 +29,7 @@ void Robot_arm::connect() {
 
     // Moves robot to base position
     cout << "Moving to base position" << endl;
-    rtde_control->moveJ(base_pos, velocity, acceleration);
+    rtde_control->moveL(base_pos, velocity, acceleration);
 }
 
 // Place reference points
@@ -64,7 +64,7 @@ void Robot_arm::validate_ref_points() {
     rtde_control->moveL(hover_ref, velocity, acceleration); 
 
     // Go to base pos
-    rtde_control->moveJ(base_pos, velocity, acceleration); 
+    rtde_control->moveL(base_pos, velocity, acceleration); 
 }
 
 void Robot_arm::confirm_point(vector<double>& ref_point) {

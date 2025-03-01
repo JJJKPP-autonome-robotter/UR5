@@ -16,7 +16,7 @@ int main() {
     double dt = 1.0/500; // Standart update rate
     double lookahead_time = 0.1; // Standart lookahead time
     double gain = 300; // Standard gain
-    vector<double> base_pos = {1.88, -2.28, 2.02, -1.30, 4.66, 0.70}; // base position for program
+    vector<double> base_pos = {0.23908, -0.34586, 0.48748, 3.09, 0.439, 0.005}; // base position for program
 
 	// Init robot and connect
 	Robot_arm ur5 = Robot_arm(ip, velocity, acceleration, dt, lookahead_time, gain, base_pos);
