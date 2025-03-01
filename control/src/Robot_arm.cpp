@@ -36,48 +36,35 @@ void Robot_arm::connect() {
 void Robot_arm::validate_ref_points() {
     // Get hover over ref point 1
     vector<double> hover_ref = ref_point_1;
-    hover_ref[3] += 0.3; // Add 10cm to z-axis
+    hover_ref[2] += 0.3; // Add 10cm to z-axis
 
     // Hover over ref point 1
-    t_start = rtde_control->initPeriod();
     rtde_control->moveL(hover_ref);
-    rtde_control->waitPeriod(t_start);
-
-    t_start = rtde_control->initPeriod();
-    rtde_control->moveL(ref_point_1); // Go down and touch
-    rtde_control->waitPeriod(t_start);
+    rtde_control->moveL(ref_point_1, velocity, acceleration); // Go down and touch
 
     // Wait for confirm
     // If not update ref coordinates
     confirm_point(ref_point_1);
-
-    t_start = rtde_control->initPeriod();
-    rtde_control->moveL(hover_ref); // Hover over ref point 1
-    rtde_control->waitPeriod(t_start);
+    rtde_control->moveL(hover_ref, velocity, acceleration); // Hover over ref point 1
 
 
     // Get hover over ref point 2
     hover_ref = ref_point_2;
-    hover_ref[3] += 0.3; // Add 10cm to z-axis
+    hover_ref[2] += 0.3; // Add 10cm to z-axis
 
     // Hover over ref point 2
-    t_start = rtde_control->initPeriod();
-    rtde_control->moveL(hover_ref); 
-    rtde_control->waitPeriod(t_start);
-
-    // Go down and touch
-    t_start = rtde_control->initPeriod();
-    rtde_control->moveL(ref_point_2); 
-    rtde_control->waitPeriod(t_start);
+    rtde_control->moveL(hover_ref);    
+    rtde_control->moveL(ref_point_2, velocity, acceleration); // Go down and touch
 
     // Wait for confitm
     // If not update ref coordinates
     confirm_point(ref_point_2);
 
     // Hover over ref point 2
-    t_start = rtde_control->initPeriod();
-    rtde_control->moveL(hover_ref); 
-    rtde_control->waitPeriod(t_start);
+    rtde_control->moveL(hover_ref, velocity, acceleration); 
+
+    // Go to base pos
+    rtde_control->moveJ(base_pos, velocity, acceleration); 
 }
 
 void Robot_arm::confirm_point(vector<double>& ref_point) {
