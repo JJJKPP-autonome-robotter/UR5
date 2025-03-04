@@ -13,6 +13,7 @@ Robot_arm::Robot_arm(string _ip, double _velocity, double _acceleration, double 
     lookahead_time = _lookahead_time; // Sets lookahead_time
     gain = _gain; // Sets gain
     base_pos = _base_pos; // Sets base position vecot of 6 with joint angles in rad
+
 }
 
 // Connect to UR robot arm
@@ -32,7 +33,7 @@ void Robot_arm::connect() {
     rtde_control->moveL(base_pos);
 }
 
-// Place reference points
+// validate ref points
 void Robot_arm::validate_ref_points() {
     double _velocity = 0.05;
     // Get hover over ref point 1
@@ -75,13 +76,46 @@ void Robot_arm::validate_ref_points() {
     // Go to base pos
     rtde_control->moveL(base_pos);
 
+    // If ref points have been updated validate again
     if (ref1_update || ref2_update) {
         cout << "Validating new ref points" << endl;
         validate_ref_points();
     }
 }
 
+// Validate drop points
+void Robot_arm::validate_drop_points() {
+    bool any_updated = false;
+
+    // Loop thrue all drop points
+    for (int i = 0; i < drop_points.size(); i++) {
+        // Get color and coordinate for drop
+        auto drop_point = next(drop_points.begin(), i);
+        string color = drop_point->first;
+        vector<double> point = drop_point->second;
+
+        // Move to drop point
+        rtde_control->moveL(point);
+
+        cout << "Is tool at drop point for: " << color << " y/n: ";
+
+        // Confirm point
+        if (confirm_point(point)) {
+            drop_points[color] = point;
+            any_updated = true;
+        } 
+    }
+
+    // If any of the drop points have been updated validate again
+    if (any_updated) {
+        cout << "validating new drop points" << endl;
+        validate_drop_points();
+    } 
+}
+
+// Confirm point by user
 bool Robot_arm::confirm_point(vector<double>& ref_point) {
+    // Wait for user input
     char in;
     cout << "Is tool on point y/n: ";
     cin >> in;
@@ -104,6 +138,7 @@ bool Robot_arm::confirm_point(vector<double>& ref_point) {
             cout << "New point is: ";
             for (auto i: new_ref_point) cout << i << ", ";
             cout << endl;
+
             return true;
         }
     }
@@ -188,4 +223,8 @@ void Robot_arm::set_base_pos(vector<double> bp){
 void Robot_arm::set_ref_points(vector<double> ref1, vector<double> ref2){
     ref_point_1 = ref1;
     ref_point_2 = ref2;
+}
+
+void Robot_arm::set_drop_points(map<string, vector<double>> _drop_points) {
+    drop_points = _drop_points;
 }
