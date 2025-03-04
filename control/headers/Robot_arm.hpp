@@ -64,7 +64,7 @@ private:
     vector<double> ref_point_2;
 
     // Privately used functions
-    void confirm_point(vector<double>&);
+    bool confirm_point(vector<double>&);
 
 };
 

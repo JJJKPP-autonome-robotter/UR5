@@ -29,23 +29,28 @@ void Robot_arm::connect() {
 
     // Moves robot to base position
     cout << "Moving to base position" << endl;
-    rtde_control->moveL(base_pos, velocity, acceleration);
+    rtde_control->moveL(base_pos);
 }
 
 // Place reference points
 void Robot_arm::validate_ref_points() {
+    double _velocity = 0.05;
     // Get hover over ref point 1
     vector<double> hover_ref = ref_point_1;
     hover_ref[2] += 0.3; // Add 10cm to z-axis
 
     // Hover over ref point 1
     rtde_control->moveL(hover_ref);
-    rtde_control->moveL(ref_point_1, velocity, acceleration); // Go down and touch
+    rtde_control->moveL(ref_point_1, _velocity, acceleration); // Go down and touch
 
     // Wait for confirm
     // If not update ref coordinates
-    confirm_point(ref_point_1);
-    rtde_control->moveL(hover_ref, velocity, acceleration); // Hover over ref point 1
+    bool ref1_update = confirm_point(ref_point_1);
+    if (ref1_update) {
+        hover_ref = ref_point_1;
+        hover_ref[2] += 0.3;
+    }
+    rtde_control->moveL(hover_ref, _velocity, acceleration); // Hover over ref point 1
 
 
     // Get hover over ref point 2
@@ -54,35 +59,43 @@ void Robot_arm::validate_ref_points() {
 
     // Hover over ref point 2
     rtde_control->moveL(hover_ref);    
-    rtde_control->moveL(ref_point_2, velocity, acceleration); // Go down and touch
+    rtde_control->moveL(ref_point_2, _velocity, acceleration); // Go down and touch
 
     // Wait for confitm
     // If not update ref coordinates
-    confirm_point(ref_point_2);
+    bool ref2_update = confirm_point(ref_point_2);
 
     // Hover over ref point 2
-    rtde_control->moveL(hover_ref, velocity, acceleration); 
+    if (ref2_update) {
+        hover_ref = ref_point_2;
+        hover_ref[2] += 0.3;
+    }
+    rtde_control->moveL(hover_ref, _velocity, acceleration); 
 
     // Go to base pos
-    rtde_control->moveL(base_pos, velocity, acceleration); 
+    rtde_control->moveL(base_pos);
+
+    if (ref1_update || ref2_update) {
+        cout << "Validating new ref points" << endl;
+        validate_ref_points();
+    }
 }
 
-void Robot_arm::confirm_point(vector<double>& ref_point) {
+bool Robot_arm::confirm_point(vector<double>& ref_point) {
     char in;
     cout << "Is tool on point y/n: ";
     cin >> in;
     if (in == 'n') {
         // Enter freedrive mode
-        while (!rtde_control->freedriveMode(vector<int32_t> {1, 1, 1, 1, 1, 1})) {
-            rtde_control->freedriveMode(vector<int32_t> {1, 1, 1, 1, 1, 1});
-        } 
-        cout << "is tool on point y/n: ";
+        rtde_control->teachMode();
+        cout << "Move tool to actual ref point.\n";
+
+        // Wait for user input
+        cout << "Is tool on point y/n: ";
         cin >> in;
         if (in == 'y') {
             // Exit freedrive mode
-            while (!rtde_control->endFreedriveMode()) {
-                rtde_control->endFreedriveMode();
-            }
+            rtde_control->endTeachMode();
             
             vector<double> new_ref_point = rtde_receive->getTargetTCPPose();
             ref_point = new_ref_point;
@@ -90,9 +103,12 @@ void Robot_arm::confirm_point(vector<double>& ref_point) {
             // Print out new ref point
             cout << "New point is: ";
             for (auto i: new_ref_point) cout << i << ", ";
-            cout << endl;   
+            cout << endl;
+            return true;
         }
     }
+
+    return false;
 }
 
 // Getters
