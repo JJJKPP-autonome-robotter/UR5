@@ -97,7 +97,7 @@ void Robot_arm::validate_drop_points() {
         // Move to drop point
         rtde_control->moveL(point);
 
-        cout << "Is tool at drop point for: " << color << " y/n: ";
+        cout << "Drop point for " << color << endl;
 
         // Confirm point
         if (confirm_point(point)) {
@@ -110,7 +110,10 @@ void Robot_arm::validate_drop_points() {
     if (any_updated) {
         cout << "validating new drop points" << endl;
         validate_drop_points();
-    } 
+    }
+
+    // Return to base pos
+    rtde_control->moveL(base_pos);
 }
 
 // Confirm point by user
@@ -225,6 +228,6 @@ void Robot_arm::set_ref_points(vector<double> ref1, vector<double> ref2){
     ref_point_2 = ref2;
 }
 
-void Robot_arm::set_drop_points(map<string, vector<double>> _drop_points) {
+void Robot_arm::set_drop_points(unordered_map<string, vector<double>> _drop_points) {
     drop_points = _drop_points;
 }

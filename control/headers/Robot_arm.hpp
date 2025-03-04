@@ -44,7 +44,7 @@ public:
     void set_gain(double); // Gain double
     void set_base_pos(vector<double>); // Base pos vector<double> {x, y, z, rx, ry, rz}
     void set_ref_points(vector<double>, vector<double>); // Ref points vector<double> {x, y, z, rx, ry, rz}
-    void set_drop_points(map<string, vector<double>>); // Map drop points to color and vector<double> {x, y, z, rx, ry, rz}
+    void set_drop_points(unordered_map<string, vector<double>>); // Map drop points to color and vector<double> {x, y, z, rx, ry, rz}
 
 private:
     // Robot specific objects and variables
@@ -64,7 +64,7 @@ private:
     vector<double> base_pos;
     vector<double> ref_point_1;
     vector<double> ref_point_2;
-    map<string, vector<double>> drop_points;
+    unordered_map<string, vector<double>> drop_points;
 
     // Privat functions
     bool confirm_point(vector<double>&);
