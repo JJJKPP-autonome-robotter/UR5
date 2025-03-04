@@ -1,26 +1,30 @@
-#ifndef PROCESSIMAGE_HPP
-#define PROCESSIMAGE_HPP
+#ifndef PROCESS_IMAGE_HPP
+#define PROCESS_IMAGE_HPP
 
 #include <opencv2/opencv.hpp>
-#include <iostream>
 #include <vector>
+#include <string>
+#include <iostream>
 
-using namespace std;
 using namespace cv;
+using namespace std;
 
 class ProcessImage {
-  public:
-      ProcessImage(const string& imagePath);
-      void detectRedMMS();
-      void showResults();
+public:
+    ProcessImage(const string& imagePath);
+    void detectRedMMS();
+    void showResults();
+    vector<Point> getCenters() const;
 
-  private:
-      Mat image;
-      Mat mask;
-      Mat output;
+private:
+    void preprocess();
+    void detectContours();  // New
 
-      void preprocess();
-      void findContours();
+    Mat image;
+    Mat hsv;
+    Mat mask;
+    Mat output;
+    vector<Point> centers;
 };
 
-#endif // PROCESSIMAGE_HPP
+#endif

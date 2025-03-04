@@ -3,6 +3,7 @@
 #include <iostream>
 
 using namespace std;  // Ensure we use std namespace
+/*
 
 int main() {
     CaptureImage camera;  // Open default camera (index 0)
@@ -19,5 +20,19 @@ int main() {
 
     return 0;
 }
+*/
 
+// test main
+int main() {
+    ProcessImage processor("/home/jeppe/GitHub/UR5/control/img/input1.jpg");
+    processor.detectRedMMS();
+    processor.showResults();
 
+    vector<Point> centers = processor.getCenters();
+    cout << "Detected M&M centers:" << endl;
+    for (const auto& center : centers) {
+        cout << "(" << center.x << ", " << center.y << ")" << endl;
+    }
+
+    return 0;
+}
