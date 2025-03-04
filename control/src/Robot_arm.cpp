@@ -2,7 +2,16 @@
 
 Robot_arm::Robot_arm() {}
 
-Robot_arm::~Robot_arm() {}
+Robot_arm::~Robot_arm() {
+    cout << "Stopping control script, and disconnecting robot" << endl;
+
+    // Stop control script
+    rtde_control->stopScript();
+
+    // Disconnect rom robot
+    rtde_control->disconnect();
+    rtde_receive->disconnect();
+}
 
 // Constructor params IP of robot, velocity, acceleration, frequency, lookahead_time, gain, vecotr of 6 with anlge in rad for each joint
 Robot_arm::Robot_arm(string _ip, double _velocity, double _acceleration, double _dt, double _lookahead_time, double _gain, vector<double> _base_pos){
