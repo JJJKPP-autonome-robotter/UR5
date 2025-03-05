@@ -1,4 +1,5 @@
 #include <../headers/Robot_arm.hpp>
+#include <../headers/Gripper.hpp>
 
 #include <iostream>
 #include <string>
@@ -8,9 +9,12 @@
 using namespace std;
 
 int main() {
+	// Get robot ip
 	string ip;
 	cout << "Enter robot ip: ";
 	cin >> ip;
+
+	// Robot arm variables
     double velocity = 0.25; // Standart velocity
     double acceleration = 0.25; // Standart acceleration
     double dt = 1.0/500; // Standart update rate
@@ -18,8 +22,19 @@ int main() {
     double gain = 300; // Standard gain
     vector<double> base_pos = {0.23908, -0.34586, 0.48748, 3.14, 0, 0}; // base position for program
 
+	// Get griper serial port
+	string gripper_port;
+	
+	// Gripper variables
+	uint32_t gripper_port_baudrate = 115200;
+
+	
+
+	// Init gripper
+	Gripper gripper = Gripper(gripper_port, gripper_port_baudrate);
+
 	// Init robot and connect
-	Robot_arm ur5 = Robot_arm(ip, velocity, acceleration, dt, lookahead_time, gain, base_pos);
+	Robot_arm ur5 = Robot_arm(ip, velocity, acceleration, dt, lookahead_time, gain, base_pos, gripper);
 	ur5.connect();
 
 	// Calibrating robot 
