@@ -1,5 +1,5 @@
 #include <../headers/Robot_arm.hpp>
-#include <../headers/Gribber.hpp>
+#include <../headers/Gripper.hpp>
 
 #include <iostream>
 #include <string>
