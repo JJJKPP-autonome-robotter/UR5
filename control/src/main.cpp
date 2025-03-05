@@ -24,6 +24,7 @@ int main() {
 
 	// Get griper serial port
 	string gripper_port;
+	gripper_port = find_port();
 	
 	// Gripper variables
 	uint32_t gripper_port_baudrate = 115200;
