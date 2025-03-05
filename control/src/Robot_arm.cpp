@@ -1,4 +1,5 @@
 #include "../headers/Robot_arm.hpp"
+#include "../headers/Gripper.hpp"
 
 Robot_arm::Robot_arm() {}
 
@@ -14,7 +15,7 @@ Robot_arm::~Robot_arm() {
 }
 
 // Constructor params IP of robot, velocity, acceleration, frequency, lookahead_time, gain, vecotr of 6 with anlge in rad for each joint
-Robot_arm::Robot_arm(string _ip, double _velocity, double _acceleration, double _dt, double _lookahead_time, double _gain, vector<double> _base_pos){
+Robot_arm::Robot_arm(string _ip, double _velocity, double _acceleration, double _dt, double _lookahead_time, double _gain, vector<double> _base_pos, Gripper* _gripper){
     ip = _ip; // Sets IP
     velocity = _velocity; // Set velocity
     acceleration = _acceleration; // Sets acceleration
@@ -22,6 +23,7 @@ Robot_arm::Robot_arm(string _ip, double _velocity, double _acceleration, double 
     lookahead_time = _lookahead_time; // Sets lookahead_time
     gain = _gain; // Sets gain
     base_pos = _base_pos; // Sets base position vecot of 6 with joint angles in rad
+    gripper = _gripper; // Sets gripper class
 
 }
 
@@ -40,11 +42,18 @@ void Robot_arm::connect() {
     // Moves robot to base position
     cout << "Moving to base position" << endl;
     rtde_control->moveL(base_pos);
+
+    // Opens gripper
+    gripper->open();
 }
 
 // validate ref points
 void Robot_arm::validate_ref_points() {
     double _velocity = 0.05;
+
+    // Open gripper
+    gripper->close();
+
     // Get hover over ref point 1
     vector<double> hover_ref = ref_point_1;
     hover_ref[2] += 0.3; // Add 10cm to z-axis
@@ -84,6 +93,7 @@ void Robot_arm::validate_ref_points() {
 
     // Go to base pos
     rtde_control->moveL(base_pos);
+    gripper->open();
 
     // If ref points have been updated validate again
     if (ref1_update || ref2_update) {
@@ -95,6 +105,9 @@ void Robot_arm::validate_ref_points() {
 // Validate drop points
 void Robot_arm::validate_drop_points() {
     bool any_updated = false;
+
+    // Open gripper
+    gripper->close();
 
     // Loop thrue all drop points
     for (int i = 0; i < drop_points.size(); i++) {
@@ -123,6 +136,7 @@ void Robot_arm::validate_drop_points() {
 
     // Return to base pos
     rtde_control->moveL(base_pos);
+    gripper->open();
 }
 
 // Confirm point by user
@@ -170,12 +184,14 @@ void Robot_arm::pick_up(string color, vector<double> point) {
     // Hover over point
     rtde_control->moveL(hover_point);
 
-    // OPEN GRIPPER
+    // Open gripper
+    gripper->open();
 
     // Lower to point
     rtde_control->moveL(point, _velocity);
 
-    // CLOSE GRIPPER
+    // Close gripper
+    gripper->close();
 
     // Hover over point
     rtde_control->moveL(hover_point, _velocity);
@@ -183,7 +199,8 @@ void Robot_arm::pick_up(string color, vector<double> point) {
     // Go to drop_point
     rtde_control->moveL(drop_points[color]);
 
-    // OOPEN GRIPPER
+    // Open gripper
+    gripper->open();
 
     // Go to base position
     rtde_control->moveL(base_pos);

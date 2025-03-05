@@ -1,5 +1,5 @@
-#include <../headers/Robot_arm.hpp>
-#include <../headers/Gripper.hpp>
+#include "../headers/Robot_arm.hpp"
+#include "../headers/Gripper.hpp"
 
 #include <iostream>
 #include <string>
@@ -31,7 +31,7 @@ int main() {
 	
 
 	// Init gripper
-	Gripper gripper = Gripper(gripper_port, gripper_port_baudrate);
+	Gripper* gripper = new Gripper(gripper_port, gripper_port_baudrate);
 
 	// Init robot and connect
 	Robot_arm ur5 = Robot_arm(ip, velocity, acceleration, dt, lookahead_time, gain, base_pos, gripper);
