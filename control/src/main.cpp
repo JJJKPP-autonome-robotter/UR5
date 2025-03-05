@@ -54,6 +54,26 @@ int main() {
 		ur5.validate_drop_points();
 	}
 
+	vector<string> test_colors = {"red", "orange", "yellow", "green", "blue", "brown", "yellow", "green"};
+
+	vector<vector<double>> test_points = {
+		{0.32520, -0.41333},
+		{0.25335, -0.46077},
+		{0.10426, -0.51534},
+		{0.25325, -0.56035},
+		{0.15228, -0.40742},
+		{0.21080, -0.59934},
+		{0.04320, -0.54633},
+		{0.31110, -0.45123}
+	};
+
+
+	for (int i = 0; i < test_colors.size(); i++) {
+		string color = test_colors[i];
+		vector<double> point = test_points[i];
+
+		ur5.pick_up(color, point);
+	}
 	// Launch GUI, take user input
 	
 	// Main Loop going until finished.
