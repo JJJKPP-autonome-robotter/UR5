@@ -16,8 +16,8 @@ int main(int argc, char* argv[]){
 	RTDEReceiveInterface rtde_receive("192.168.0.133");
 	std::cout << "ALL Connections established!!" << std::endl;
 
-	double velocity = 0.5;
-	double acceleration = 0.5;
+	double velocity = 1.5;
+	double acceleration = 1;
 	double dt = 1.0/500;
 	double lookahead_time = 0.1;
 	double gain = 300;
