@@ -17,10 +17,10 @@ public:
     Gripper(string, uint32_t); // string Port name u_int baudrate
 
     // Methods
-    bool open_gripper(); // Opens gripper
-    bool close_gripper(); // Closes gripper
-    void gripper_send(const string&); // Sends message
-    string gripper_read(); // Reads unkown length response
+    bool open(); // Opens gripper
+    bool close(); // Closes gripper
+    void send(const string&); // Sends message
+    string read(); // Reads unkown length response
     bool wait_for_target_message(string); // Waits for target message
 
 private:

@@ -20,9 +20,9 @@ Gripper::Gripper(string _port_name, uint32_t _baudrate) : port(io, _port_name) {
 }
 
 // Open the gripper returns true if gripper is open
-bool Gripper::open_gripper() {
+bool Gripper::open() {
     string message = "open";
-    gripper_send(message); // Send open message to gripper
+    send(message); // Send open message to gripper
 
     bool open = false;
     open = wait_for_target_message("open"); // Waits for response from gripper
@@ -31,9 +31,9 @@ bool Gripper::open_gripper() {
 
 }
 
-bool Gripper::close_gripper() {
+bool Gripper::close() {
     string message = "close";
-    gripper_send(message); // Sends close message to gripper
+    send(message); // Sends close message to gripper
 
     bool closed = false;
     closed = wait_for_target_message("closed"); // Waits for response from gripper
@@ -42,12 +42,12 @@ bool Gripper::close_gripper() {
 }
 
 // Send message to gripper
-void Gripper::gripper_send(const string& message) {
+void Gripper::send(const string& message) {
     write(port, buffer(message)); // Write message to gripper
 }
 
 // Read message from gripper
-string Gripper::gripper_read() {
+string Gripper::read() {
     boost::asio::streambuf buffer;
     read_until(port, buffer, '\n'); // Read until newline or time out
 
@@ -64,7 +64,7 @@ bool Gripper::wait_for_target_message(string target_message) {
 
     // Read until target is received
     while (true) {
-        input_message = gripper_read();
+        input_message = read();
 
         if (input_message == "error") return false;
         if (input_message == target_message) return  true;

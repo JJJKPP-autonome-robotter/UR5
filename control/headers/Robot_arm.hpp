@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "Gripper.hpp"
 #include <ur_rtde/rtde_control_interface.h>
 #include <ur_rtde/rtde_receive_interface.h>
 #include <thread>
@@ -19,7 +20,7 @@ public:
     Robot_arm();
     ~Robot_arm();
     // Constructor param IP, Velocity, Accelerations, Frequency, Lookahead_time, gain, vector 6 joint agnles in rad
-    Robot_arm(string, double, double, double, double, double, vector<double>);
+    Robot_arm(string, double, double, double, double, double, vector<double>, Gripper*);
 
     // Methods
     void connect();// Connects to Robot arm
@@ -51,8 +52,10 @@ private:
     // Robot specific objects and variables
     ur_rtde::RTDEControlInterface* rtde_control = nullptr;
     ur_rtde::RTDEReceiveInterface* rtde_receive = nullptr;
-    chrono::steady_clock::time_point t_start;
     string ip;
+
+    // Gripper
+    Gripper* gripper;
 
     // Movement variables
     double velocity;
