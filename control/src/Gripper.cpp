@@ -7,7 +7,7 @@ Gripper::~Gripper() {
 }
 
 // Constructor
-Gripper::Gripper(string _port_name, u_int _baudrate) : port(io, _port_name) {
+Gripper::Gripper(string _port_name, uint32_t _baudrate) : port(io, _port_name) {
     port_name = _port_name;
     baudrate = _baudrate;
 
@@ -19,17 +19,31 @@ Gripper::Gripper(string _port_name, u_int _baudrate) : port(io, _port_name) {
     port.set_option(serial_port_base::flow_control(serial_port_base::flow_control::none));
 }
 
-// Open the gripper
+// Open the gripper returns true if gripper is open
 bool Gripper::open_gripper() {
     string message = "open";
-    gripper_send(message);
+    gripper_send(message); // Send open message to gripper
 
+    bool open = false;
+    open = wait_for_target_message("open"); // Waits for response from gripper
 
+    return open;
+
+}
+
+bool Gripper::close_gripper() {
+    string message = "close";
+    gripper_send(message); // Sends close message to gripper
+
+    bool closed = false;
+    closed = wait_for_target_message("closed"); // Waits for response from gripper
+
+    return closed;
 }
 
 // Send message to gripper
 void Gripper::gripper_send(const string& message) {
-    write(port, buffer(message));
+    write(port, buffer(message)); // Write message to gripper
 }
 
 // Read message from gripper
@@ -42,4 +56,19 @@ string Gripper::gripper_read() {
     getline(input_stream, response); // Convert response to string
 
     return response;
+}
+
+// Reads until target emssage is received
+bool Gripper::wait_for_target_message(string target_message) {
+    string input_message;
+
+    // Read until target is received
+    while (true) {
+        input_message = gripper_read();
+
+        if (input_message == "error") return false;
+        if (input_message == target_message) return  true;
+
+    }
+
 }

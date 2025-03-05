@@ -14,20 +14,21 @@ class Gripper
 public:
     Gripper();
     ~Gripper();
-    Gripper(string, u_int);
+    Gripper(string, uint32_t); // string Port name u_int baudrate
 
     // Methods
-    bool open_gripper();
-    bool close_gripper();
-    void gripper_send(const string&);
-    string gripper_read();
+    bool open_gripper(); // Opens gripper
+    bool close_gripper(); // Closes gripper
+    void gripper_send(const string&); // Sends message
+    string gripper_read(); // Reads unkown length response
+    bool wait_for_target_message(string); // Waits for target message
 
 private:
     io_service io;
     serial_port port;
 
     string port_name;
-    u_int baudrate;
+    uint32_t baudrate;
 
 };
 
