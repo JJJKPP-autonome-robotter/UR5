@@ -24,6 +24,8 @@ int main() {
 
 	// Get griper serial port
 	string gripper_port;
+	// Make function which finds the port the pico is connected to
+	// And sends it to the griper class constructor
 	gripper_port = find_port();
 	
 	// Gripper variables
