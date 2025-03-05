@@ -158,6 +158,38 @@ bool Robot_arm::confirm_point(vector<double>& ref_point) {
     return false;
 }
 
+void Robot_arm::pick_up(string color, vector<double> point) {
+    double _velocity = 0.1; // Pick up velocity
+
+    point.insert(point.end(), {0.1, 3.14, 0, 0}); // Add table height and tool rotation
+
+    // Make hover point, to avoid collision
+    vector<double> hover_point = point;
+    hover_point[2] += 0.2;
+
+    // Hover over point
+    rtde_control->moveL(hover_point);
+
+    // OPEN GRIPPER
+
+    // Lower to point
+    rtde_control->moveL(point, _velocity);
+
+    // CLOSE GRIPPER
+
+    // Hover over point
+    rtde_control->moveL(hover_point, _velocity);
+
+    // Go to drop_point
+    rtde_control->moveL(drop_points[color]);
+
+    // OOPEN GRIPPER
+
+    // Go to base position
+    rtde_control->moveL(base_pos);
+
+}
+
 // Getters
 // Gets double velocity and returns double velocity
 double Robot_arm::get_velocity(){
