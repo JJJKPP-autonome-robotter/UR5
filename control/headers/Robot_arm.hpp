@@ -25,6 +25,7 @@ public:
     void connect();// Connects to Robot arm
     void validate_ref_points(); // Validate refpoints
     void validate_drop_points(); // Validate drop points
+    void pick_up(string, vector<double>); // Pick up color from point vector<double> {x, y}
 
     // Getters
     double get_velocity(); // Velocity double
