@@ -5,6 +5,9 @@
 
 #include <boost/asio.hpp>
 #include <string>
+#include <filesystem>
+#include <iostream>
+#include <fstream>
 
 using namespace boost::asio;
 using namespace std;
@@ -12,9 +15,8 @@ using namespace std;
 class Gripper
 {
 public:
-    Gripper();
     ~Gripper();
-    Gripper(string, uint32_t); // string Port name u_int baudrate
+    Gripper(uint32_t); // string Port name u_int baudrate
 
     // Methods
     bool open(); // Opens gripper
@@ -22,6 +24,7 @@ public:
     void send(const string&); // Sends message
     string read(); // Reads unkown length response
     bool wait_for_target_message(string); // Waits for target message
+    string find_port(); // Finds the port the Pico is connected to
 
 private:
     io_service io;

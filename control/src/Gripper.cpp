@@ -1,15 +1,20 @@
 #include "../headers/Gripper.hpp"
 
-Gripper::Gripper() {}
 
 Gripper::~Gripper() {
     port.close(); // Close the port
 }
 
 // Constructor
-Gripper::Gripper(string _port_name, uint32_t _baudrate) : port(io, _port_name) {
-    port_name = _port_name;
+Gripper::Gripper(uint32_t _baudrate) : port(io) {
+    port_name = find_port(); // Get device addres
     baudrate = _baudrate;
+
+    // Check if device was found
+    if (port_name.empty()) throw runtime_error("No valid device found");
+
+    // Open port
+    port.open(port_name);
 
     // Set options for the serial port
     port.set_option(serial_port_base::baud_rate(baudrate));
@@ -71,4 +76,34 @@ bool Gripper::wait_for_target_message(string target_message) {
 
     }
 
+    return false;
+}
+
+string Gripper::find_port() {
+    cout << "Scanning for Raspberry Pi Pico..." << endl;
+
+    // Load all usb devices
+    for (const auto& entry : std::filesystem::directory_iterator("/dev/")) {
+        std::string path = entry.path().string(); // Get path of device
+
+        // Look for ttyACM or ttyUSB devices
+        if (path.find("ttyACM") != std::string::npos || path.find("ttyUSB") != std::string::npos) {  
+
+            // Check USB device info using lsusb
+            std::stringstream cmd;
+            cmd << "lsusb -d 2e8a:000a | grep -q 'Raspberry Pi Pico'";
+
+            int result = system(cmd.str().c_str());
+
+            // If Raspberry Pi Pico found return path
+            if (result == 0) {
+                std::cout << "Found Raspberry Pi Pico at: " << path << std::endl;
+                return path;
+            }
+        }
+    }
+
+    // If no path found return empty
+    cout << "No raspberry Pi Pico found" << endl;
+    return "";
 }
