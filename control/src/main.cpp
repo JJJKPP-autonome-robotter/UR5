@@ -21,17 +21,12 @@ int main() {
     double lookahead_time = 0.1; // Standart lookahead time
     double gain = 300; // Standard gain
     vector<double> base_pos = {0.23908, -0.34586, 0.48748, 3.14, 0, 0}; // base position for program
-
-	// Get griper serial port
-	string gripper_port;
 	
 	// Gripper variables
 	uint32_t gripper_port_baudrate = 115200;
 
-	
-
 	// Init gripper
-	Gripper* gripper = new Gripper(gripper_port, gripper_port_baudrate);
+	Gripper* gripper = new Gripper(gripper_port_baudrate);
 
 	// Init robot and connect
 	Robot_arm ur5 = Robot_arm(ip, velocity, acceleration, dt, lookahead_time, gain, base_pos, gripper);
