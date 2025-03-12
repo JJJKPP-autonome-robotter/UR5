@@ -32,7 +32,7 @@ void ProcessImage::preprocess() {
     // define red color range
     // pixel in hsv range set to white else black
 
-    string color = "green";
+    string color = "yellow";
 
     if (color == "red"){
         Mat mask1, mask2;
