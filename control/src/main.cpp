@@ -30,7 +30,7 @@ int main() {
 
 // test main
 int main() {
-    ProcessImage processor("/home/jeppe/GitHub/UR5/control/img/input14.jpg");
+    ProcessImage processor("/home/jeppe/GitHub/UR5/control/img/input13.jpg");
     processor.detectRedMMS();
     processor.showResults();
 

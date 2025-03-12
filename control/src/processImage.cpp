@@ -47,7 +47,7 @@ void ProcessImage::detectContours() {  // Renamed from findContours
                                                                         // CHAIN_APPROX_SIMPLE removes redundant points 
 
     const double minArea = 600.0; // contour less than 50 pixels ignored
-    const double maxAspectRatio = 1.3; // contour with aspect ratio greater than 1.3 processed as 2 centers
+    const double maxAspectRatio = 1.40; // contour with aspect ratio greater than 1.3 processed as 2 centers
 
     centers.clear();
 
@@ -60,7 +60,7 @@ void ProcessImage::detectContours() {  // Renamed from findContours
         }
 
         // NOTE: vi har brug for bedre måde end rectangle, prøv cirkel?
-        Rect boundingBox = boundingRect(contour); // rectangel around contour
+        Rect boundingBox = boundingRect(contour); // rectangel around contour   
 
         // check aspect ratio
         double aspectRatio = static_cast<double>(max(boundingBox.width, boundingBox.height)) /
