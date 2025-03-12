@@ -46,8 +46,8 @@ void ProcessImage::detectContours() {  // Renamed from findContours
     findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);   // RETR_EXTERNAL = only external contours
                                                                         // CHAIN_APPROX_SIMPLE removes redundant points 
 
-    const double minArea = 50.0; // contour less than 50 pixels ignored
-    const double maxAspectRatio = 1.3; // contour with aspect ratio greater than 1.3 processed as 2 centers
+    const double minArea = 600.0; // contour less than 50 pixels ignored
+    const double maxAspectRatio = 1.40; // contour with aspect ratio greater than 1.3 processed as 2 centers
 
     centers.clear();
 
@@ -60,7 +60,7 @@ void ProcessImage::detectContours() {  // Renamed from findContours
         }
 
         // NOTE: vi har brug for bedre måde end rectangle, prøv cirkel?
-        Rect boundingBox = boundingRect(contour); // rectangel around contour
+        Rect boundingBox = boundingRect(contour); // rectangel around contour   
 
         // check aspect ratio
         double aspectRatio = static_cast<double>(max(boundingBox.width, boundingBox.height)) /
@@ -107,10 +107,17 @@ void ProcessImage::detectRedMMS() {
 
 // show output
 void ProcessImage::showResults() {
-    imshow("Original Image", image);
-    imshow("HSV", hsv);
+    //imshow("Original Image", image);
+    //imshow("HSV", hsv);
+    
+    namedWindow("Red M&Ms Mask", WINDOW_NORMAL);
+    resizeWindow("Red M&Ms Mask", 1280, 720);
     imshow("Red M&Ms Mask", mask);
+
+    namedWindow("Detected Red M&Ms", WINDOW_NORMAL);
+    resizeWindow("Detected Red M&Ms", 1280, 720);
     imshow("Detected Red M&Ms", output);
+
     waitKey(0);
 }
 
