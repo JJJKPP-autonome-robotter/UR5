@@ -26,22 +26,26 @@ Gripper::Gripper(uint32_t _baudrate) : port(io) {
 
 // Open the gripper returns true if gripper is open
 bool Gripper::open() {
-    string message = "open";
+    string message = "o";
     send(message); // Send open message to gripper
 
     bool open = false;
     open = wait_for_target_message("open"); // Waits for response from gripper
+
+    if (open) cout << "OPEN" << endl;
 
     return open;
 
 }
 
 bool Gripper::close() {
-    string message = "close";
+    string message = "c";
     send(message); // Sends close message to gripper
 
     bool closed = false;
     closed = wait_for_target_message("closed"); // Waits for response from gripper
+
+    if (closed) cout << "CLOSED" << endl;
 
     return closed;
 }
@@ -60,6 +64,10 @@ string Gripper::read() {
     string response;
     getline(input_stream, response); // Convert response to string
 
+    response.erase(remove_if(response.begin(), response.end(), [](char c) {
+        return !isalpha(c);
+    }), response.end());
+
     return response;
 }
 
@@ -69,7 +77,7 @@ bool Gripper::wait_for_target_message(string target_message) {
 
     // Read until target is received
     while (true) {
-        input_message = read();
+        input_message = read(); // Read pico response
 
         if (input_message == "error") return false;
         if (input_message == target_message) return  true;
