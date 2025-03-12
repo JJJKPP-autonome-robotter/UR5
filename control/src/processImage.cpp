@@ -9,6 +9,15 @@ ProcessImage::ProcessImage(const string& imagePath) {
         exit(1);
     }
     output = image.clone(); 
+
+
+    colorRanges["red"] = { Scalar(0, 120, 100), Scalar(10, 255, 255) };
+    colorRanges["red2"] = { Scalar(170, 120, 100), Scalar(180, 255, 255) };  // Second red range
+    colorRanges["blue"] = { Scalar(100, 150, 100), Scalar(140, 255, 255) };
+    colorRanges["green"] = { Scalar(40, 40, 40), Scalar(90, 255, 255) };
+    colorRanges["orange"] = { Scalar(10, 180, 100), Scalar(18, 255, 255) };
+    colorRanges["yellow"] = { Scalar(19, 150, 120), Scalar(26, 255, 255) };
+    colorRanges["brown"] = { Scalar(8, 150, 40), Scalar(14, 255, 120) };
 }
 
 
@@ -22,12 +31,18 @@ void ProcessImage::preprocess() {
 
     // define red color range
     // pixel in hsv range set to white else black
-    Mat mask1, mask2;
-    inRange(hsv, Scalar(0, 120, 100), Scalar(10, 255, 255), mask1);    // red near 0°      Scalar(hue, saturation, value)
-    inRange(hsv, Scalar(170, 120, 100), Scalar(180, 255, 255), mask2); // red near 360°
 
-    mask = mask1 | mask2; // combinere 2 masks (bitwise or)
+    string color = "green";
 
+    if (color == "red"){
+        Mat mask1, mask2;
+        inRange(hsv, colorRanges["red"].first, colorRanges["red"].second, mask1);    // red near 0°      Scalar(hue, saturation, value)
+        inRange(hsv, colorRanges["red2"].first,  colorRanges["red2"].second, mask2); // red near 360°
+
+        mask = mask1 | mask2; // combinere 2 masks (bitwise or)
+    } else{
+        inRange(hsv, colorRanges[color].first,  colorRanges[color].second, mask);   
+    }
     //imshow("before morph", mask); //DEBUG
 
     // Apply morphological operations to clean mask 

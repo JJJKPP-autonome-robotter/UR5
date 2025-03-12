@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <map>
 
 using namespace cv;
 using namespace std;
@@ -25,6 +26,7 @@ private:
     Mat mask;
     Mat output;
     vector<Point> centers;
+    map<string, pair<Scalar, Scalar>> colorRanges;
 };
 
 #endif
