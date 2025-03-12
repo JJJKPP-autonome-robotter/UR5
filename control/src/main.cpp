@@ -1,5 +1,6 @@
 #include "../headers/captureImage.hpp"
 #include "../headers/processImage.hpp"
+#include "../headers/PixelToRobot.hpp"
 #include <iostream>
 
 using namespace std;  // Ensure we use std namespace
@@ -30,13 +31,23 @@ int main() {
 
 // test main
 int main() {
+    PixelToRobot PixelToRobot("/home/jeppe/GitHub/UR5/control/img/input32.jpg");
+    PixelToRobot.calibrate();
+    PixelToRobot.showResults();
+
+    vector<Point> centers = PixelToRobot.getCenters();
+    cout << "calibration points:" << endl;
+    for (const auto& center : centers) {
+        cout << "(" << center.x << ", " << center.y << ")" << endl;
+    }
+
     ProcessImage processor("/home/jeppe/GitHub/UR5/control/img/input32.jpg");
     processor.detectRedMMS();
     processor.showResults();
 
-    vector<Point> centers = processor.getCenters();
+    vector<Point> centers2 = processor.getCenters();
     cout << "Detected M&M centers:" << endl;
-    for (const auto& center : centers) {
+    for (const auto& center : centers2) {
         cout << "(" << center.x << ", " << center.y << ")" << endl;
     }
 
