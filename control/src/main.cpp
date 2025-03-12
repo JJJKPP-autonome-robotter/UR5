@@ -20,7 +20,7 @@ int main() {
     double dt = 1.0/500; // Standart update rate
     double lookahead_time = 0.1; // Standart lookahead time
     double gain = 300; // Standard gain
-    vector<double> base_pos = {0.23908, -0.34586, 0.48748, 3.14, 0, 0}; // base position for program
+    vector<double> base_pos = {0.03639, -0.23713, 0.43206, 3.14, 0, 0}; // base position for program
 	
 	// Gripper variables
 	uint32_t gripper_port_baudrate = 115200;
