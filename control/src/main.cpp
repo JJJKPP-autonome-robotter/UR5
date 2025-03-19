@@ -3,6 +3,7 @@
 #include "../headers/PixelToRobot.hpp"
 #include "../headers/Robot_arm.hpp"
 #include "../headers/Gripper.hpp"
+#include "../headers/Data_saver.hpp"
 
 #include <iostream>
 #include <string>
@@ -126,4 +127,44 @@ int main() {
 	// Launch GUI, take user input
 	
 	// Main Loop going until finished.
+	try {
+        // Create an instance of DataSaver with a file name
+        DataSaver dataSaver("data.txt");
+
+        // Read existing data from the file
+        dataSaver.readData();
+
+        // Display the current data
+        std::cout << "Current data:" << std::endl;
+        for (const auto& entry : dataSaver.getData()) {
+            std::cout << entry.b << " " << entry.c << " " << entry.d << std::endl;
+        }
+
+        // Add new data
+        Data newData = {4, 5, 6};
+        dataSaver.addData(newData);
+
+        // Modify data programmatically (example: increment all values by 1)
+        dataSaver.modifyData([](std::vector<Data>& data) {
+            for (auto& entry : data) {
+                entry.b += 1;
+                entry.c += 1;
+                entry.d += 1;
+            }
+        });
+
+        // Write the updated data back to the file
+        dataSaver.writeData();
+
+        // Display the updated data
+        std::cout << "Updated data:" << std::endl;
+        for (const auto& entry : dataSaver.getData()) {
+            std::cout << entry.b << " " << entry.c << " " << entry.d << std::endl;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+
+    return 0;
 }
