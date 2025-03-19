@@ -6,15 +6,16 @@ Gripper::~Gripper() {
 }
 
 // Constructor
-Gripper::Gripper(uint32_t _baudrate) : port(io) {
-    port_name = find_port(); // Get device addres
+Gripper::Gripper(uint32_t _baudrate, vector<double> _offset) : port(io) {
+    portName = findPort(); // Get device addres
     baudrate = _baudrate;
+    offset = _offset;
 
     // Check if device was found
-    if (port_name.empty()) throw runtime_error("No valid device found");
+    if (portName.empty()) throw runtime_error("No valid device found");
 
     // Open port
-    port.open(port_name);
+    port.open(portName);
 
     // Set options for the serial port
     port.set_option(serial_port_base::baud_rate(baudrate));
@@ -30,7 +31,7 @@ bool Gripper::open() {
     send(message); // Send open message to gripper
 
     bool open = false;
-    open = wait_for_target_message("open"); // Waits for response from gripper
+    open = waitForTargetMessage("open"); // Waits for response from gripper
 
     if (open) cout << "OPEN" << endl;
 
@@ -43,7 +44,7 @@ bool Gripper::close() {
     send(message); // Sends close message to gripper
 
     bool closed = false;
-    closed = wait_for_target_message("closed"); // Waits for response from gripper
+    closed = waitForTargetMessage("closed"); // Waits for response from gripper
 
     if (closed) cout << "CLOSED" << endl;
 
@@ -60,9 +61,9 @@ string Gripper::read() {
     boost::asio::streambuf buffer;
     read_until(port, buffer, '\n'); // Read until newline or time out
 
-    istream input_stream(&buffer);
+    istream inputStream(&buffer);
     string response;
-    getline(input_stream, response); // Convert response to string
+    getline(inputStream, response); // Convert response to string
 
     response.erase(remove_if(response.begin(), response.end(), [](char c) {
         return !isalpha(c);
@@ -72,22 +73,22 @@ string Gripper::read() {
 }
 
 // Reads until target emssage is received
-bool Gripper::wait_for_target_message(string target_message) {
-    string input_message;
+bool Gripper::waitForTargetMessage(string target_message) {
+    string inputMessage;
 
     // Read until target is received
     while (true) {
-        input_message = read(); // Read pico response
+        inputMessage = read(); // Read pico response
 
-        if (input_message == "error") return false;
-        if (input_message == target_message) return  true;
+        if (inputMessage == "error") return false;
+        if (inputMessage == target_message) return  true;
 
     }
 
     return false;
 }
 
-string Gripper::find_port() {
+string Gripper::findPort() {
     cout << "Scanning for Raspberry Pi Pico..." << endl;
 
     // Load all usb devices
@@ -114,4 +115,8 @@ string Gripper::find_port() {
     // If no path found return empty
     cout << "No raspberry Pi Pico found" << endl;
     return "";
+}
+
+vector<double> Gripper::getOffset() {
+    return offset;
 }

@@ -1,3 +1,6 @@
+#include "../headers/CaptureImage.hpp"
+#include "../headers/ProcessImage.hpp"
+#include "../headers/PixelToRobot.hpp"
 #include "../headers/Robot_arm.hpp"
 #include "../headers/Gripper.hpp"
 #include "../headers/Data_saver.hpp"
@@ -7,7 +10,11 @@
 #include <array>
 #include <vector>
 
-using namespace std;
+using namespace std;  // Ensure we use std namespace
+
+
+string imagePath = "input.jpg";  
+
 
 int main() {
 	// Get robot ip
@@ -19,36 +26,38 @@ int main() {
     double velocity = 0.25; // Standart velocity
     double acceleration = 0.25; // Standart acceleration
     double dt = 1.0/500; // Standart update rate
-    double lookahead_time = 0.1; // Standart lookahead time
+    double lookaheadTime = 0.1; // Standart lookahead time
     double gain = 300; // Standard gain
-    vector<double> base_pos = {0.03639, -0.23713, 0.43206, 3.14, 0, 0}; // base position for program
+    vector<double> basePos = {0.03639, -0.23713, 0.43206, 3.14, 0, 0}; // base position for program
 	
 	// Gripper variables
-	uint32_t gripper_port_baudrate = 115200;
+	uint32_t gripperPortBaudrate = 115200;
+	vector<double> tcpOffset = {0, 0, 0.216, 0, 0, 0};
 
 	// Init gripper
-	Gripper* gripper = new Gripper(gripper_port_baudrate);
+	Gripper* gripper = new Gripper(gripperPortBaudrate, tcpOffset);
 
 	// Init robot and connect
-	Robot_arm ur5 = Robot_arm(ip, velocity, acceleration, dt, lookahead_time, gain, base_pos, gripper);
+	RobotArm ur5 = RobotArm(ip, velocity, acceleration, dt, lookaheadTime, gain, basePos, gripper);
 	ur5.connect();
 
 	// Calibrating robot 
 	// Set Refpoints
-	vector<double> ref_point_1 = {-0.09295, -0.42590, 0, 3.14, 0, 0};
-	vector<double> ref_point_2 = {0.32133, -0.24458, 0, 3.14, 0, 0};
-	ur5.set_ref_points(ref_point_1, ref_point_2);
+	vector<double> refPoint1 = {-0.09295, -0.42590, 0, 3.14, 0, 0};
+	vector<double> refPoint2 = {0.32133, -0.24458, 0, 3.14, 0, 0};
+	vector<double> refPoint3 = {0.32133, -0.24458, 0, 3.14, 0, 0};
+	ur5.setRefPoints(refPoint1, refPoint2, refPoint3);
 
 	// Ask for validation of ref points
 	char in;
 	cout << "Want to validate ref points y/n: ";
 	cin >> in;
 	if (in == 'y') {
-		ur5.validate_ref_points();
+		ur5.validateRefPoints();
 	}
 
 	// Set Drop points
-	unordered_map<string, vector<double>> drop_points = {
+	unordered_map<string, vector<double>> dropPoints = {
 		{"red", {0.04479, -0.82136, 0.2, 3.14, 0, 0}},
 		{"orange", {0.13456, -0.78130, 0.2, 3.14, 0, 0}},
 		{"yellow", {0.22856, -0.74187, 0.2, 3.14, 0, 0}},
@@ -56,35 +65,71 @@ int main() {
 		{"blue", {0.41081, -0.66906, 0.2, 3.14, 0, 0}},
 		{"brown", {0.50244, -0.62575, 0.2, 3.14, 0, 0}}
 	};
-	ur5.set_drop_points(drop_points);
+	ur5.setDropPoints(dropPoints);
 
 	// Ask for validation of ref points
 	cout << "Want to validate drop points y/n: ";
 	cin >> in;
 	if (in == 'y') {
-		ur5.validate_drop_points();
+		ur5.validateDropPoints();
 	}
+  
+  // tager billed
+    CaptureImage camera(4);
+    
+    if (camera.captureAndSave("input.jpg")) {
+        cout << "Image successfully captured and saved!" << endl;
+    } else {
+        cerr << "Failed to capture image." << endl;
+    }
 
-	vector<string> test_colors = {"red", "orange", "yellow", "green", "blue", "brown", "yellow", "green"};
+    // 
+    ProcessImage processor(imagePath);
+    processor.detectRedMMS();
+    processor.showResults(); // DEBUG
 
-	vector<vector<double>> test_points = {
-		{0.32520, -0.41333},
-		{0.25335, -0.46077},
-		{0.10426, -0.51534},
-		{0.25325, -0.56035},
-		{0.15228, -0.40742},
-		{0.21080, -0.59934},
-		{0.04320, -0.54633},
-		{0.31110, -0.45123}
-	};
+    vector<Point> centers = processor.getCenters();
+    cout << "Detected M&M centers:" << endl;
+    for (const auto& center : centers) {
+        cout << "(" << center.x << ", " << center.y << ")" << endl;
+    }
+   
+    Point2f testPixel = centers[0];
 
+   // beregn koordinater
+    PixelToRobot pixelToRobot(imagePath);
 
-	for (int i = 0; i < test_colors.size(); i++) {
-		string color = test_colors[i];
-		vector<double> point = test_points[i];
+	refPoint1 = ur5.getRefPoint1();
+	refPoint2 = ur5.getRefPoint2();
+	refPoint3 = ur5.getRefPoint3();
 
-		ur5.pick_up(color, point);
+	for (int i = 0; i < 6; i++) {
+		cout << refPoint1[i] << ", ";
 	}
+	cout << endl;
+	for (int i = 0; i < 6; i++) {
+		cout << refPoint2[i] << ", ";
+	}
+	cout << endl;
+	for (int i = 0; i < 6; i++) {
+		cout << refPoint3[i] << ", ";
+	}
+	cout << endl;
+
+    vector<Point2f> robotPoints = {
+        Point2f(refPoint1[0], refPoint1[1]),
+        Point2f(refPoint2[0], refPoint2[1]),
+        Point2f(refPoint3[0], refPoint3[1])
+    };
+
+    pixelToRobot.calibrate(robotPoints);
+
+    pixelToRobot.showResults(); // DEBUG
+    Point2f robotCoord = pixelToRobot.transformPoint(testPixel);
+
+    // Output result
+    cout << "Pixel (" << testPixel.x << ", " << testPixel.y << ") -> "
+        << "Robot (" << robotCoord.x << ", " << robotCoord.y << ")" << endl;
 	// Launch GUI, take user input
 	
 	// Main Loop going until finished.

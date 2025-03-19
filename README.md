@@ -10,9 +10,9 @@ Library and guid at for installation at [RTDE library.](https://gitlab.com/sduro
 
 ### OpenCV Library
 Install OpenCV Development Package: <br>
-    ```bash
+```bash
     sudo apt install libopencv-dev
-    ```
+```
 #### Verification
 
 To verify the installation, run<br>
