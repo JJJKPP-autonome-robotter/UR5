@@ -71,11 +71,21 @@ void PixelToRobot::detectContours() {  // Renamed from findContours
 
 
 // combine
-void PixelToRobot::calibrate() {
+void PixelToRobot::calibrate(const vector<Point2f>& robot_points) {
     preprocess();
     detectContours();
-}
 
+    // Ensure we have exactly 3 detected points before computing transformation
+    if (centers.size() != 3) {
+        cerr << "Error: Calibration failed. Need exactly 3 detected centers, but found " << centers.size() << "." << endl;
+        return;
+    }
+
+    // Compute transformation matrix using detected centers and predefined robot coordinates
+    computeTransformation(centers, robot_points);
+
+    cout << "Calibration done successfully!" << endl;
+}
 // show output
 void PixelToRobot::showResults() {
     namedWindow("calibrate points", WINDOW_NORMAL);
@@ -85,6 +95,28 @@ void PixelToRobot::showResults() {
     waitKey(0);
 }
 
-vector<Point> PixelToRobot::getCenters() const {
+vector<Point2f> PixelToRobot::getCenters() const {
     return centers;
+}
+
+// Constructor: Computes the affine transformation matrix
+void PixelToRobot::computeTransformation(const vector<Point2f>& pixel_points, 
+                                         const vector<Point2f>& robot_points) {
+    if (pixel_points.size() == 3 && robot_points.size() == 3) {
+        affine_matrix = getAffineTransform(pixel_points, robot_points);
+    } else {
+        throw runtime_error("Exactly 3 points are required for affine transformation.");
+    }
+}
+
+// Function to transform a pixel coordinate to a robot coordinate
+Point2f PixelToRobot::transformPoint(const Point2f& pixel_point) const {
+    if (affine_matrix.empty()) {
+        throw runtime_error("Transformation matrix not set. Call computeTransformation() first.");
+    }
+
+    Mat src = (Mat_<double>(3, 1) << pixel_point.x, pixel_point.y, 1);
+    Mat dst = affine_matrix * src;
+
+    return Point2f(dst.at<double>(0, 0), dst.at<double>(1, 0));
 }

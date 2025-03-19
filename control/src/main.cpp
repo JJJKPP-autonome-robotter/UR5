@@ -5,9 +5,14 @@
 
 using namespace std;  // Ensure we use std namespace
 
-/*
+
+string imagePath = "/home/jeppe/GitHub/UR5/control/img/input40.png";  
+
+// test main
 int main() {
-    CaptureImage camera;  // Open default camera (index 0)
+
+    // tager billed
+    CaptureImage camera(0);
     
     if (camera.captureAndSave("input.jpg")) {
         cout << "Image successfully captured and saved!" << endl;
@@ -15,41 +20,37 @@ int main() {
         cerr << "Failed to capture image." << endl;
     }
 
-    ProcessImage processor("input.jpg"); 
+    // 
+    ProcessImage processor(imagePath);
     processor.detectRedMMS();
-    processor.showResults();
+    //processor.showResults(); // DEBUG
 
     vector<Point> centers = processor.getCenters();
     cout << "Detected M&M centers:" << endl;
     for (const auto& center : centers) {
         cout << "(" << center.x << ", " << center.y << ")" << endl;
     }
+   
+    Point2f testPixel = centers[0];
 
-    return 0;
-}
-*/
+   // beregn koordinater
+    PixelToRobot pixelToRobot(imagePath);
 
-// test main
-int main() {
-    PixelToRobot PixelToRobot("/home/jeppe/GitHub/UR5/control/img/input32.jpg");
-    PixelToRobot.calibrate();
-    PixelToRobot.showResults();
+    vector<Point2f> robot_points = {
+        Point2f(-0.09295, -0.42590),
+        Point2f(0.32133, -0.2504458),
+        Point2f(-0.09295, -0.2504458)
+    };
 
-    vector<Point> centers = PixelToRobot.getCenters();
-    cout << "calibration points:" << endl;
-    for (const auto& center : centers) {
-        cout << "(" << center.x << ", " << center.y << ")" << endl;
-    }
+    pixelToRobot.calibrate(robot_points);
 
-    ProcessImage processor("/home/jeppe/GitHub/UR5/control/img/input32.jpg");
-    processor.detectRedMMS();
-    processor.showResults();
+    //pixelToRobot.showResults(); // DEBUG
+    Point2f robotCoord = pixelToRobot.transformPoint(testPixel);
 
-    vector<Point> centers2 = processor.getCenters();
-    cout << "Detected M&M centers:" << endl;
-    for (const auto& center : centers2) {
-        cout << "(" << center.x << ", " << center.y << ")" << endl;
-    }
+    // Output result
+    cout << "Pixel (" << testPixel.x << ", " << testPixel.y << ") -> "
+        << "Robot (" << robotCoord.x << ", " << robotCoord.y << ")" << endl;
 
+    
     return 0;
 }

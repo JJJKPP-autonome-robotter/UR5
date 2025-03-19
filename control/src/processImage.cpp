@@ -32,7 +32,7 @@ void ProcessImage::preprocess() {
     // define red color range
     // pixel in hsv range set to white else black
 
-    string color = "yellow";
+    string color = "red";
 
     if (color == "red"){
         Mat mask1, mask2;
@@ -61,7 +61,8 @@ void ProcessImage::detectContours() {  // Renamed from findContours
     findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);   // RETR_EXTERNAL = only external contours
                                                                         // CHAIN_APPROX_SIMPLE removes redundant points 
 
-    const double minArea = 600.0; // contour less than 50 pixels ignored
+    const double minArea = 1000.0; // contour less than 50 pixels ignored
+    const double maxArea = 4000.0;
     const double maxAspectRatio = 1.40; // contour with aspect ratio greater than 1.3 processed as 2 centers
 
     centers.clear();
@@ -70,7 +71,7 @@ void ProcessImage::detectContours() {  // Renamed from findContours
 
         // filter smal contours
         double area = contourArea(contour); 
-        if (area < minArea) {  
+        if (area < minArea || area > maxArea) {
             continue;
         }
 
