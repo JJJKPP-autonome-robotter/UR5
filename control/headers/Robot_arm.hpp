@@ -37,6 +37,7 @@ public:
     vector<double> get_base_pos(); // Base pos vector<double> {x, y, z, rx, ry, rz}
     vector<double> get_ref_point_1(); // Ref point 1 vector<double> {x, y, z, rx, ry, rz}
     vector<double> get_ref_point_2(); // Ref point 2 vector<double> {x, y, z, rx, ry, rz}
+    vector<double> get_ref_point_3(); // Ref point 3 vector<double> {x, y, z, rx, ry, rz}
 
     // Setters
     void set_velocity(double); // Velocity double

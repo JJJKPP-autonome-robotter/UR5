@@ -271,6 +271,10 @@ vector<double> Robot_arm::get_ref_point_2(){
     return ref_point_2;
 }
 
+// Gets vector (6 element: joint angles in rads) double and returns vector (6 element: joint angles in rads) double
+vector<double> Robot_arm::get_ref_point_3(){
+    return ref_point_3;
+}
 
 // Setters
 // Sets velocity in Robot_arm to the variable "v"

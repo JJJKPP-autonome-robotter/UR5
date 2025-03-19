@@ -12,7 +12,7 @@
 using namespace std;  // Ensure we use std namespace
 
 
-string imagePath = "/home/jeppe/GitHub/UR5/control/img/input40.png";  
+string imagePath = "input.jpg";  
 
 int main() {
 	// Get robot ip
@@ -30,9 +30,10 @@ int main() {
 	
 	// Gripper variables
 	uint32_t gripper_port_baudrate = 115200;
+	vector<double> tcp_offset = {0, 0, 0.1, 0, 0, 0};
 
 	// Init gripper
-	Gripper* gripper = new Gripper(gripper_port_baudrate);
+	Gripper* gripper = new Gripper(gripper_port_baudrate, tcp_offset);
 
 	// Init robot and connect
 	Robot_arm ur5 = Robot_arm(ip, velocity, acceleration, dt, lookahead_time, gain, base_pos, gripper);
@@ -70,30 +71,9 @@ int main() {
 	if (in == 'y') {
 		ur5.validate_drop_points();
 	}
-
-	vector<string> test_colors = {"red", "orange", "yellow", "green", "blue", "brown", "yellow", "green"};
-
-	vector<vector<double>> test_points = {
-		{0.32520, -0.41333},
-		{0.25335, -0.46077},
-		{0.10426, -0.51534},
-		{0.25325, -0.56035},
-		{0.15228, -0.40742},
-		{0.21080, -0.59934},
-		{0.04320, -0.54633},
-		{0.31110, -0.45123}
-	};
-
-
-	for (int i = 0; i < test_colors.size(); i++) {
-		string color = test_colors[i];
-		vector<double> point = test_points[i];
-
-		ur5.pick_up(color, point);
-	}
   
   // tager billed
-    CaptureImage camera(0);
+    CaptureImage camera(4);
     
     if (camera.captureAndSave("input.jpg")) {
         cout << "Image successfully captured and saved!" << endl;
@@ -104,7 +84,7 @@ int main() {
     // 
     ProcessImage processor(imagePath);
     processor.detectRedMMS();
-    //processor.showResults(); // DEBUG
+    processor.showResults(); // DEBUG
 
     vector<Point> centers = processor.getCenters();
     cout << "Detected M&M centers:" << endl;
@@ -117,15 +97,32 @@ int main() {
    // beregn koordinater
     PixelToRobot pixelToRobot(imagePath);
 
+	ref_point_1 = ur5.get_ref_point_1();
+	ref_point_2 = ur5.get_ref_point_2();
+	ref_point_3 = ur5.get_ref_point_3();
+
+	for (int i = 0; i < 6; i++) {
+		cout << ref_point_1[i] << ", ";
+	}
+	cout << endl;
+	for (int i = 0; i < 6; i++) {
+		cout << ref_point_2[i] << ", ";
+	}
+	cout << endl;
+	for (int i = 0; i < 6; i++) {
+		cout << ref_point_3[i] << ", ";
+	}
+	cout << endl;
+
     vector<Point2f> robot_points = {
-        Point2f(-0.09295, -0.42590),
-        Point2f(0.32133, -0.2504458),
-        Point2f(-0.09295, -0.2504458)
+        Point2f(ref_point_1[0], ref_point_1[1]),
+        Point2f(ref_point_2[0], ref_point_2[1]),
+        Point2f(ref_point_3[0], ref_point_3[1])
     };
 
     pixelToRobot.calibrate(robot_points);
 
-    //pixelToRobot.showResults(); // DEBUG
+    pixelToRobot.showResults(); // DEBUG
     Point2f robotCoord = pixelToRobot.transformPoint(testPixel);
 
     // Output result
