@@ -1,4 +1,4 @@
-#include "../headers/processImage.hpp"  // Include the header
+#include "../headers/ProcessImage.hpp"  // Include the header
 
 
 // load image =D

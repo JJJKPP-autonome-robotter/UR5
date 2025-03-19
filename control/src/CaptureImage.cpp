@@ -1,4 +1,4 @@
-#include "../headers/captureImage.hpp"
+#include "../headers/CaptureImage.hpp"
 
 CaptureImage::CaptureImage(int cameraIndex) {
     cap.open(cameraIndex);
