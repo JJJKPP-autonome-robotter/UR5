@@ -60,7 +60,7 @@ void Robot_arm::validate_ref_points() {
 
     // Get hover over ref point 1
     vector<double> hover_ref = ref_point_1;
-    hover_ref[2] += 0.3; // Add 10cm to z-axis
+    hover_ref[2] += 0.1; // Add 10cm to z-axis
 
     // Hover over ref point 1
     rtde_control->moveL(hover_ref);
@@ -71,14 +71,14 @@ void Robot_arm::validate_ref_points() {
     bool ref1_update = confirm_point(ref_point_1);
     if (ref1_update) {
         hover_ref = ref_point_1;
-        hover_ref[2] += 0.3;
+        hover_ref[2] += 0.1;
     }
     rtde_control->moveL(hover_ref, _velocity, acceleration); // Hover over ref point 1
 
 
     // Get hover over ref point 2
     hover_ref = ref_point_2;
-    hover_ref[2] += 0.3; // Add 10cm to z-axis
+    hover_ref[2] += 0.1; // Add 10cm to z-axis
 
     // Hover over ref point 2
     rtde_control->moveL(hover_ref);    
@@ -91,7 +91,26 @@ void Robot_arm::validate_ref_points() {
     // Hover over ref point 2
     if (ref2_update) {
         hover_ref = ref_point_2;
-        hover_ref[2] += 0.3;
+        hover_ref[2] += 0.1;
+    }
+    rtde_control->moveL(hover_ref, _velocity, acceleration);
+
+    // Get hover over ref point 3
+    hover_ref = ref_point_3;
+    hover_ref[2] += 0.1; // Add 10cm to z-axis
+
+    // Hover over ref point 3
+    rtde_control->moveL(hover_ref);    
+    rtde_control->moveL(ref_point_3, _velocity, acceleration); // Go down and touch
+
+    // Wait for confitm
+    // If not update ref coordinates
+    bool ref3_update = confirm_point(ref_point_3);
+
+    // Hover over ref point 2
+    if (ref3_update) {
+        hover_ref = ref_point_3;
+        hover_ref[2] += 0.1;
     }
     rtde_control->moveL(hover_ref, _velocity, acceleration); 
 
@@ -285,9 +304,10 @@ void Robot_arm::set_base_pos(vector<double> bp){
 }
 
 // Sets ref_point_1 to variable ref1, and ref_point_2 to ref2
-void Robot_arm::set_ref_points(vector<double> ref1, vector<double> ref2){
+void Robot_arm::set_ref_points(vector<double> ref1, vector<double> ref2, vector<double> ref3){
     ref_point_1 = ref1;
     ref_point_2 = ref2;
+    ref_point_3 = ref3;
 }
 
 void Robot_arm::set_drop_points(unordered_map<string, vector<double>> _drop_points) {

@@ -36,7 +36,8 @@ int main() {
 	// Set Refpoints
 	vector<double> ref_point_1 = {-0.09295, -0.42590, 0, 3.14, 0, 0};
 	vector<double> ref_point_2 = {0.32133, -0.24458, 0, 3.14, 0, 0};
-	ur5.set_ref_points(ref_point_1, ref_point_2);
+	vector<double> ref_point_3 = {0.32133, -0.24458, 0, 3.14, 0, 0};
+	ur5.set_ref_points(ref_point_1, ref_point_2, ref_point_3);
 
 	// Ask for validation of ref points
 	char in;
