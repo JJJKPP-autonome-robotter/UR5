@@ -16,7 +16,7 @@ class Gripper
 {
 public:
     ~Gripper();
-    Gripper(uint32_t); // string Port name u_int baudrate
+    Gripper(uint32_t, vector<double>); // string Port name u_int baudrate
 
     // Methods
     bool open(); // Opens gripper
@@ -26,12 +26,16 @@ public:
     bool wait_for_target_message(string); // Waits for target message
     string find_port(); // Finds the port the Pico is connected to
 
+    vector<double> get_offset();
+
 private:
     io_service io;
     serial_port port;
 
     string port_name;
     uint32_t baudrate;
+
+    vector<double> offset;
 
 };
 

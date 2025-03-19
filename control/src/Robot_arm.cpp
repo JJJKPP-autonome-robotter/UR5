@@ -39,6 +39,10 @@ void Robot_arm::connect() {
     rtde_receive = new ur_rtde::RTDEReceiveInterface(ip);
     cout << "SUCCES" << endl;
 
+    // Set TCP offset for griper
+    vector<double> offset = gripper->get_offset();
+    rtde_control->setTcp(offset);
+
     // Moves robot to base position
     cout << "Moving to base position" << endl;
     rtde_control->moveL(base_pos);

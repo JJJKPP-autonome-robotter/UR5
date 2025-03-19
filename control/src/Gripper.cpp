@@ -6,9 +6,10 @@ Gripper::~Gripper() {
 }
 
 // Constructor
-Gripper::Gripper(uint32_t _baudrate) : port(io) {
+Gripper::Gripper(uint32_t _baudrate, vector<double> _offset) : port(io) {
     port_name = find_port(); // Get device addres
     baudrate = _baudrate;
+    offset = _offset;
 
     // Check if device was found
     if (port_name.empty()) throw runtime_error("No valid device found");
@@ -114,4 +115,8 @@ string Gripper::find_port() {
     // If no path found return empty
     cout << "No raspberry Pi Pico found" << endl;
     return "";
+}
+
+vector<double> Gripper::get_offset() {
+    return offset;
 }
