@@ -14,45 +14,45 @@
 
 using namespace std;
 
-class Robot_arm
+class RobotArm
 {
 public:
-    Robot_arm();
-    ~Robot_arm();
+    RobotArm();
+    ~RobotArm();
     // Constructor param IP, Velocity, Accelerations, Frequency, Lookahead_time, gain, vector 6 joint agnles in rad
-    Robot_arm(string, double, double, double, double, double, vector<double>, Gripper*);
+    RobotArm(string, double, double, double, double, double, vector<double>, Gripper*);
 
     // Methods
     void connect();// Connects to Robot arm
-    void validate_ref_points(); // Validate refpoints
-    void validate_drop_points(); // Validate drop points
-    void pick_up(string, vector<double>); // Pick up color from point vector<double> {x, y}
+    void validateRefPoints(); // Validate refpoints
+    void validateDropPoints(); // Validate drop points
+    void pickUp(string, vector<double>); // Pick up color from point vector<double> {x, y}
 
     // Getters
-    double get_velocity(); // Velocity double
-    double get_acceleration(); // Acceleration double
-    double get_dt(); // Frequency double
-    double get_lookahead_time(); // Lookahead_time double
-    double get_gain(); // Gain double
-    vector<double> get_base_pos(); // Base pos vector<double> {x, y, z, rx, ry, rz}
-    vector<double> get_ref_point_1(); // Ref point 1 vector<double> {x, y, z, rx, ry, rz}
-    vector<double> get_ref_point_2(); // Ref point 2 vector<double> {x, y, z, rx, ry, rz}
-    vector<double> get_ref_point_3(); // Ref point 3 vector<double> {x, y, z, rx, ry, rz}
+    double getVelocity(); // Velocity double
+    double getAcceleration(); // Acceleration double
+    double getDt(); // Frequency double
+    double getLookaheadTime(); // Lookahead_time double
+    double getGain(); // Gain double
+    vector<double> getBasePos(); // Base pos vector<double> {x, y, z, rx, ry, rz}
+    vector<double> getRefPoint1(); // Ref point 1 vector<double> {x, y, z, rx, ry, rz}
+    vector<double> getRefPoint2(); // Ref point 2 vector<double> {x, y, z, rx, ry, rz}
+    vector<double> getRefPoint3(); // Ref point 3 vector<double> {x, y, z, rx, ry, rz}
 
     // Setters
-    void set_velocity(double); // Velocity double
-    void set_acceleration(double); // Acceleration double
-    void set_dt(double); // Frequency double
-    void set_lookahead_time(double); // Lookahead_time double
-    void set_gain(double); // Gain double
-    void set_base_pos(vector<double>); // Base pos vector<double> {x, y, z, rx, ry, rz}
-    void set_ref_points(vector<double>, vector<double>, vector<double>); // Ref points vector<double> {x, y, z, rx, ry, rz}
-    void set_drop_points(unordered_map<string, vector<double>>); // Map drop points to color and vector<double> {x, y, z, rx, ry, rz}
+    void setVelocity(double); // Velocity double
+    void setAcceleration(double); // Acceleration double
+    void setDt(double); // Frequency double
+    void setLookaheadTime(double); // Lookahead_time double
+    void setGain(double); // Gain double
+    void setBasePos(vector<double>); // Base pos vector<double> {x, y, z, rx, ry, rz}
+    void setRefPoints(vector<double>, vector<double>, vector<double>); // Ref points vector<double> {x, y, z, rx, ry, rz}
+    void setDropPoints(unordered_map<string, vector<double>>); // Map drop points to color and vector<double> {x, y, z, rx, ry, rz}
 
 private:
     // Robot specific objects and variables
-    ur_rtde::RTDEControlInterface* rtde_control = nullptr;
-    ur_rtde::RTDEReceiveInterface* rtde_receive = nullptr;
+    ur_rtde::RTDEControlInterface* rtdeControl = nullptr;
+    ur_rtde::RTDEReceiveInterface* rtdeReceive = nullptr;
     string ip;
 
     // Gripper
@@ -62,18 +62,18 @@ private:
     double velocity;
     double acceleration;
     double dt;
-    double lookahead_time;
+    double lookaheadTime;
     double gain;
 
     // Stadnart positions
-    vector<double> base_pos;
-    vector<double> ref_point_1;
-    vector<double> ref_point_2;
-    vector<double> ref_point_3;
-    unordered_map<string, vector<double>> drop_points;
+    vector<double> basePos;
+    vector<double> refPoint1;
+    vector<double> refPoint2;
+    vector<double> refPoint3;
+    unordered_map<string, vector<double>> dropPoints;
 
     // Privat functions
-    bool confirm_point(vector<double>&);
+    bool confirmPoint(vector<double>&);
 
 };
 

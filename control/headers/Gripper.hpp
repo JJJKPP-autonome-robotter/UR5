@@ -23,16 +23,16 @@ public:
     bool close(); // Closes gripper
     void send(const string&); // Sends message
     string read(); // Reads unkown length response
-    bool wait_for_target_message(string); // Waits for target message
-    string find_port(); // Finds the port the Pico is connected to
+    bool waitForTargetMessage(string); // Waits for target message
+    string findPort(); // Finds the port the Pico is connected to
 
-    vector<double> get_offset();
+    vector<double> getOffset();
 
 private:
     io_service io;
     serial_port port;
 
-    string port_name;
+    string portName;
     uint32_t baudrate;
 
     vector<double> offset;

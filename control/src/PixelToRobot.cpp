@@ -71,7 +71,7 @@ void PixelToRobot::detectContours() {  // Renamed from findContours
 
 
 // combine
-void PixelToRobot::calibrate(const vector<Point2f>& robot_points) {
+void PixelToRobot::calibrate(const vector<Point2f>& robotPoints) {
     preprocess();
     detectContours();
 
@@ -82,7 +82,7 @@ void PixelToRobot::calibrate(const vector<Point2f>& robot_points) {
     }
 
     // Compute transformation matrix using detected centers and predefined robot coordinates
-    computeTransformation(centers, robot_points);
+    computeTransformation(centers, robotPoints);
 
     cout << "Calibration done successfully!" << endl;
 }
@@ -100,23 +100,23 @@ vector<Point2f> PixelToRobot::getCenters() const {
 }
 
 // Constructor: Computes the affine transformation matrix
-void PixelToRobot::computeTransformation(const vector<Point2f>& pixel_points, 
-                                         const vector<Point2f>& robot_points) {
-    if (pixel_points.size() == 3 && robot_points.size() == 3) {
-        affine_matrix = getAffineTransform(pixel_points, robot_points);
+void PixelToRobot::computeTransformation(const vector<Point2f>& pixelPoints, 
+                                         const vector<Point2f>& robotPoints) {
+    if (pixelPoints.size() == 3 && robotPoints.size() == 3) {
+        affineMatrix = getAffineTransform(pixelPoints, robotPoints);
     } else {
         throw runtime_error("Exactly 3 points are required for affine transformation.");
     }
 }
 
 // Function to transform a pixel coordinate to a robot coordinate
-Point2f PixelToRobot::transformPoint(const Point2f& pixel_point) const {
-    if (affine_matrix.empty()) {
+Point2f PixelToRobot::transformPoint(const Point2f& pixelPoint) const {
+    if (affineMatrix.empty()) {
         throw runtime_error("Transformation matrix not set. Call computeTransformation() first.");
     }
 
-    Mat src = (Mat_<double>(3, 1) << pixel_point.x, pixel_point.y, 1);
-    Mat dst = affine_matrix * src;
+    Mat src = (Mat_<double>(3, 1) << pixelPoint.x, pixelPoint.y, 1);
+    Mat dst = affineMatrix * src;
 
     return Point2f(dst.at<double>(0, 0), dst.at<double>(1, 0));
 }
