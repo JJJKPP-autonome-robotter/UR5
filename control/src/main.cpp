@@ -93,7 +93,7 @@ int main() {
         cout << "(" << center.x << ", " << center.y << ")" << endl;
     }
    
-    Point2f testPixel = centers[0];
+    Point2f mmCenter = centers[0];
 
    // beregn koordinater
     PixelToRobot pixelToRobot(imagePath);
@@ -115,19 +115,13 @@ int main() {
 	}
 	cout << endl;
 
-    vector<Point2f> robotPoints = {
-        Point2f(refPoint1[0], refPoint1[1]),
-        Point2f(refPoint2[0], refPoint2[1]),
-        Point2f(refPoint3[0], refPoint3[1])
-    };
-
-    pixelToRobot.calibrate(robotPoints);
+    pixelToRobot.calibrate(refPoint1, refPoint2, refPoint3);
 
     pixelToRobot.showResults(); // DEBUG
-    Point2f robotCoord = pixelToRobot.transformPoint(testPixel);
+    Point2f robotCoord = pixelToRobot.transformPoint(mmCenter);
 
     // Output result
-    cout << "Pixel (" << testPixel.x << ", " << testPixel.y << ") -> "
+    cout << "Pixel (" << mmCenter.x << ", " << mmCenter.y << ") -> "
         << "Robot (" << robotCoord.x << ", " << robotCoord.y << ")" << endl;
 	// Launch GUI, take user input
 	

@@ -88,7 +88,13 @@ void PixelToRobot::detectContours() {  // Renamed from findContours
 
 
 // combine
-void PixelToRobot::calibrate(const vector<Point2f>& robotPoints) {
+void PixelToRobot::calibrate(const vector<double>& refPoint1, const vector<double>& refPoint2, const vector<double>& refPoint3) {
+    vector<Point2f> robotPoints = {
+        Point2f(refPoint1[0], refPoint1[1]),
+        Point2f(refPoint2[0], refPoint2[1]),
+        Point2f(refPoint3[0], refPoint3[1])
+    };
+
     preprocess();
     detectContours();
 
