@@ -31,7 +31,7 @@ int main() {
 	
 	// Gripper variables
 	uint32_t gripperPortBaudrate = 115200;
-	vector<double> tcpOffset = {0, 0, 0.1, 0, 0, 0};
+	vector<double> tcpOffset = {0, 0, 0.216, 0, 0, 0};
 
 	// Init gripper
 	Gripper* gripper = new Gripper(gripperPortBaudrate, tcpOffset);
