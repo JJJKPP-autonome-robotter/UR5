@@ -14,6 +14,7 @@ using namespace std;  // Ensure we use std namespace
 
 string imagePath = "input.jpg";  
 
+
 int main() {
 	// Get robot ip
 	string ip;

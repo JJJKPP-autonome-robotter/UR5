@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <algorithm> 
 #include <map>
 
 using namespace cv;
