@@ -61,8 +61,25 @@ void PixelToRobot::detectContours() {  // Renamed from findContours
         // if aspect ratio is less than maxAspectRatio, asume 1 center
         Point center(boundingBox.x + boundingBox.width / 2, boundingBox.y + boundingBox.height / 2);
         centers.push_back(center);
-
     }
+
+
+    // afstand fra 0,0
+    auto distanceFromOrigin = [](const Point& p) {
+        return p.x * p.x + p.y * p.y;
+    };
+
+    // sort centers
+    sort(centers.begin(), centers.end(), [&](const Point& a, const Point& b) {
+        return distanceFromOrigin(a) < distanceFromOrigin(b);
+    });
+
+    // print centers
+    cout << "Sorted Centers:" << std::endl;
+    for (const auto& center : centers) {
+        cout << "(" << center.x << ", " << center.y << ")" << std::endl;
+    }
+
     // draw centers on output
     for (const auto& center : centers) {
         circle(output, center, 3, Scalar(0, 255, 0), -1);  // size 3 and color green
