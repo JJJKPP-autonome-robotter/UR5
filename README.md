@@ -21,6 +21,13 @@ pkg-config --modversion opencv4
 ```
 
 
+sudo apt update
+sudo apt install qt6-base-dev qt6-tools-dev qt6-tools-dev-tools
+
+
+qmake6 --version
+
+
 ### Robot setup
 To control the robot over Ethernet. Make sure to install the URCap External Control.<br>
 For installation guid see the [URCap installtion.](https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/blob/master/ur_robot_driver/doc/install_urcap_e_series.md)<br>
