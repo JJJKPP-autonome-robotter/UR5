@@ -1,49 +1,43 @@
-#include "Data_saver.hpp"
+#include "../headers/Data_saver.hpp"
 
-DataSaver::DataSaver(const std::string& file) : filename(file) {}
+DataSaver::DataSaver() {}
+DataSaver::~DataSaver() {}
 
-void DataSaver::readData() {
-    std::ifstream fin(filename);
-    if (!fin.is_open()) {
-        throw std::runtime_error("Error: Could not open file " + filename);
-    }
+DataSaver::DataSaver(string _cfgName) {
+    cfgName = _cfgName;
 
-    data.clear();
-    Data temp;
-    while (fin >> temp.b >> temp.c >> temp.d) {
-        data.push_back(temp);
-    }
-    fin.close();
-}
+    cfg = YAML::LoadFile(cfgName);
 
-void DataSaver::addData(const Data& newData) {
-    data.push_back(newData);
-}
-
-void DataSaver::modifyData(const std::function<void(std::vector<Data>&)>& modifier) {
-    modifier(data); // Apply the modification logic
-}
-
-void DataSaver::writeData() {
-    std::ofstream fout("temp.txt");
-    if (!fout.is_open()) {
-        throw std::runtime_error("Error: Could not open temporary file for writing");
-    }
-
-    for (const auto& entry : data) {
-        fout << entry.b << ' ' << entry.c << ' ' << entry.d << '\n';
-    }
-    fout.close();
-
-    // Replace the original file with the temporary file
-    if (std::remove(filename.c_str()) != 0) {
-        throw std::runtime_error("Error: Could not delete the original file");
-    }
-    if (std::rename("temp.txt", filename.c_str()) != 0) {
-        throw std::runtime_error("Error: Could not rename the temporary file");
+    if (!cfg) {
+        throw runtime_error("Failed to load config file!");
     }
 }
 
-const std::vector<Data>& DataSaver::getData() const {
-    return data;
+ConfigMap DataSaver::loadConfig(string settingsTree) {
+    ConfigMap configMap;
+
+    for (const auto& setting : cfg[settingsTree]) {
+        std::string key = setting.first.as<string>();
+        const YAML::Node& value = setting.second;
+
+        cout << key << endl;
+
+        if (value.IsScalar()) {
+            if (value.Tag() == "!!int") configMap[key] = value.as<int>();
+            else if (value.Tag() == "!!float") configMap[key] = value.as<double>();
+            else if (value.Tag() == "!!bool") configMap[key] = value.as<bool>();
+            else configMap[key] = value.as<string>();
+        }
+        if (value.IsSequence()) {
+            if (value[0].IsScalar()) {
+                cout << "Value 0 is: " << value[0].Tag() << endl;
+                if (value[0].Tag() == "?") {
+                    
+                    configMap[key] = value.as<vector<double>>();
+                } 
+            }
+        }
+    }
+
+    return configMap;
 }

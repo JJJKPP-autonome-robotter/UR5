@@ -13,8 +13,10 @@ find_package(ur_rtde REQUIRED)
 
 find_package(OpenCV REQUIRED)
 
+find_package(yaml-cpp REQUIRED)
+
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${HEADERS_DIR} ${OpenCV_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ur_rtde::rtde ${OpenCV_LIBS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ur_rtde::rtde ${OpenCV_LIBS} yaml-cpp)

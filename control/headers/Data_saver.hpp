@@ -1,39 +1,33 @@
+#ifndef DATASAVER_HPP
+#define DATASAVER_HPP
+
 #pragma once
-#include <fstream>
+
+#include <iostream>
+#include <yaml-cpp/yaml.h>
 #include <string>
 #include <vector>
-#include <functional>
-#include <stdexcept>
-#include <cstdio> // For std::remove and std::rename
+#include <unordered_map>
+#include <variant>
 
-// Define a struct to represent a single data entry
-struct Data {
-    int b;
-    int c;
-    int d;
-};
+using namespace std;
+
+using ConfigValue = std::variant<vector<double>, string, int, double, bool>;
+using ConfigMap = std::unordered_map<std::string, ConfigValue>;
 
 class DataSaver {
-private:
-    std::string filename;
-    std::vector<Data> data; // Store all data in memory
-
 public:
-    // Constructor to initialize the file name
-    DataSaver(const std::string& file);
+    DataSaver();
+    ~DataSaver();
+    DataSaver(string);
 
-    // Function to read all data from the file into memory
-    void readData();
+    ConfigMap loadConfig(string);
 
-    // Function to add a new data set
-    void addData(const Data& newData);
+private:
+    string cfgName;
 
-    // Function to modify data programmatically
-    void modifyData(const std::function<void(std::vector<Data>&)>& modifier);
+    YAML::Node cfg;
 
-    // Function to write all data back to the file
-    void writeData();
-
-    // Getter for the data (optional, for debugging or external use)
-    const std::vector<Data>& getData() const;
 };
+
+#endif
