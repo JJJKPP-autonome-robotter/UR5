@@ -13,12 +13,12 @@ using namespace std;
 class ProcessImage {
 public:
     ProcessImage(const string& imagePath);
-    void detectRedMMS();
+    void detectMMS(string color);
     void showResults();
     vector<Point> getCenters() const;
 
 private:
-    void preprocess();
+    void preprocess(string color);
     void detectContours();  // New
 
     Mat image;
