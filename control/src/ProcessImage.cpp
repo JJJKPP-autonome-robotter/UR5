@@ -22,18 +22,14 @@ ProcessImage::ProcessImage(const string& imagePath) {
 
 
 // Preprocess the image, enhancer image
-void ProcessImage::preprocess() {
+void ProcessImage::preprocess(string color) {
     // convert image colors to hsv
     cvtColor(image, hsv, COLOR_BGR2HSV); 
 
     // Apply Gaussian blur to reduce noise
     GaussianBlur(hsv, hsv, Size(5, 5), 0); // size is how much to blur
 
-    // define red color range
     // pixel in hsv range set to white else black
-
-    string color = "red";
-
     if (color == "red"){
         Mat mask1, mask2;
         inRange(hsv, colorRanges["red"].first, colorRanges["red"].second, mask1);    // red near 0°      Scalar(hue, saturation, value)
@@ -116,8 +112,8 @@ void ProcessImage::detectContours() {  // Renamed from findContours
 
 
 // combine
-void ProcessImage::detectRedMMS() {
-    preprocess();
+void ProcessImage::detectMMS(string color) {
+    preprocess(color);
     detectContours();
 }
 

@@ -85,7 +85,7 @@ int main() {
 
     // 
     ProcessImage processor(imagePath);
-    processor.detectRedMMS();
+    processor.detectMMS("red");
     processor.showResults(); // DEBUG
 
     vector<Point> centers = processor.getCenters();
