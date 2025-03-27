@@ -12,36 +12,27 @@
 #include <variant>
 #include <unordered_map>
 
-using namespace std;  // Ensure we use std namespace
-using ConfigValue = std::variant<vector<double>, string, int, double, bool>;
-using ConfigMap = std::unordered_map<std::string, ConfigValue>;
-
-
-string imagePath = "input.jpg";  
+using namespace std;  // Ensure we use std namespace 
 
 
 int main() {
-    DataSaver config = DataSaver("../config.yaml");
-    ConfigMap cfg;
-    cfg = config.loadConfig("robotSettings");
+    ConfigFile cfg("../config.yaml");
 
 	// Get robot ip
-	string ip = get<string>(cfg["robotIp"]);
+	string ip = cfg.get<string>("robotCfg","robotIp");
 	cout << "Enter robot ip: " << ip << endl;
 
 	// Robot arm variables
-    double velocity = 0.25; // Standart velocity
-    double acceleration = 0.25; // Standart acceleration
-    double dt = 1.0/500; // Standart update rate
-    double lookaheadTime = 0.1; // Standart lookahead time
-    double gain = 300; // Standard gain
-    vector<double> basePos = get<vector<double>>(cfg["basePos"]); // base position for program
-
-    cout << basePos[0];
+    double velocity = cfg.get<double>("robotCfg","velocity"); // Standart velocity
+    double acceleration = cfg.get<double>("robotCfg","acceleration"); // Standart acceleration
+    double dt = cfg.get<double>("robotCfg","dt"); // Standart update rate
+    double lookaheadTime = cfg.get<double>("robotCfg","lookaheadTime"); // Standart lookahead time
+    double gain = cfg.get<double>("robotCfg","gain"); // Standard gain
+    vector<double> basePos = cfg.get<vector<double>>("robotCfg","basePos"); // base position for program
 	
 	// Gripper variables
-	uint32_t gripperPortBaudrate = 115200;
-	vector<double> tcpOffset = {0, 0, 0.216, 0, 0, 0};
+	uint32_t gripperPortBaudrate = cfg.get<uint32_t>("gripperCfg","baudrate");
+	vector<double> tcpOffset = cfg.get<vector<double>>("gripperCfg","tcpOffset");
 
 	// Init gripper
 	Gripper* gripper = new Gripper(gripperPortBaudrate, tcpOffset);
@@ -52,9 +43,9 @@ int main() {
 
 	// Calibrating robot 
 	// Set Refpoints
-	vector<double> refPoint1 = {-0.09295, -0.42590, 0, 3.14, 0, 0};
-	vector<double> refPoint2 = {0.32133, -0.24458, 0, 3.14, 0, 0};
-	vector<double> refPoint3 = {0.32133, -0.24458, 0, 3.14, 0, 0};
+	vector<double> refPoint1 = cfg.get<vector<double>>("robotCfg","refPoint1");
+	vector<double> refPoint2 = cfg.get<vector<double>>("robotCfg","refPoint2");
+	vector<double> refPoint3 = cfg.get<vector<double>>("robotCfg","refpoint3");
 	ur5.setRefPoints(refPoint1, refPoint2, refPoint3);
 
 	// Ask for validation of ref points
@@ -66,14 +57,7 @@ int main() {
 	}
 
 	// Set Drop points
-	unordered_map<string, vector<double>> dropPoints = {
-		{"red", {0.04479, -0.82136, 0.2, 3.14, 0, 0}},
-		{"orange", {0.13456, -0.78130, 0.2, 3.14, 0, 0}},
-		{"yellow", {0.22856, -0.74187, 0.2, 3.14, 0, 0}},
-		{"green", {0.31588, -0.70640, 0.2, 3.14, 0, 0}},
-		{"blue", {0.41081, -0.66906, 0.2, 3.14, 0, 0}},
-		{"brown", {0.50244, -0.62575, 0.2, 3.14, 0, 0}}
-	};
+	unordered_map<string, vector<double>> dropPoints = cfg.get<unordered_map<string, vector<double>>>("robotCfg","dropPoints");
 	ur5.setDropPoints(dropPoints);
 
 	// Ask for validation of ref points
@@ -82,7 +66,9 @@ int main() {
 	if (in == 'y') {
 		ur5.validateDropPoints();
 	}
-  
+	
+	string imagePath = cfg.get<string>("cvCfg","inmagePath"); 
+
   // tager billed
     CaptureImage camera(4);
     

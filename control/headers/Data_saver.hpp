@@ -1,32 +1,36 @@
-#ifndef DATASAVER_HPP
-#define DATASAVER_HPP
+#ifndef CONFIG_FILE_HPP
+#define CONFIG_FILE_HPP
 
 #pragma once
 
 #include <iostream>
 #include <yaml-cpp/yaml.h>
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <variant>
+#include <fstream>
 
 using namespace std;
 
-using ConfigValue = std::variant<vector<double>, string, int, double, bool>;
-using ConfigMap = std::unordered_map<std::string, ConfigValue>;
-
-class DataSaver {
+class ConfigFile {
 public:
-    DataSaver();
-    ~DataSaver();
-    DataSaver(string);
+    ConfigFile();
+    ~ConfigFile();
+    explicit ConfigFile(string);
 
-    ConfigMap loadConfig(string);
+    template<typename T>
+    T get(string key, string key1) const {
+        if (config[key][key1]) return config[key][key1].as<T>();
+        throw runtime_error("Config file is missing: " + key);
+    }
+
+    template<typename T>
+    void set(string key, string key1, const T& value) {
+        config[key][key1] = value;
+    }
+
+    void save() const;
 
 private:
-    string cfgName;
-
-    YAML::Node cfg;
+    string fileName;
+    YAML::Node config;
 
 };
 

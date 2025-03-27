@@ -1,9 +1,25 @@
-robotSettings:
+robotCfg:
+  robotIp: "192.168.1.94"
   refPoint1: [-0.09295, -0.42590, 0, 3.14, 0, 0]
   refPoint2: [0.32133, -0.24458, 0, 3.14, 0, 0]
   refPoint3: [0.32133, -0.24458, 0, 3.14, 0, 0]
   basePos: [0.03639, -0.23713, 0.43206, 3.14, 0, 0]
-  testPos: [1, 1, 1, 1, 1]
-  robotIp: "192.168.1.94"
+  velocity: 0.25
+  acceleration: 0.25
+  dt: 0.002
+  lookaheadTime: 0.1
+  gain: 300
+  dropPoints:
+    red: [0.04479, -0.82136, 0.2, 3.14, 0, 0]
+    orange: [0.13456, -0.78130, 0.2, 3.14, 0, 0]
+    yellow: [0.22856, -0.74187, 0.2, 3.14, 0, 0]
+    green: [0.31588, -0.70640, 0.2, 3.14, 0, 0]
+    blue: [0.41081, -0.66906, 0.2, 3.14, 0, 0]
+    brown: [0.50244, -0.62575, 0.2, 3.14, 0, 0]
 
-cvSetteings:
+gripperCfg:
+  baudrate: 115200
+  tcpOffset: [0, 0, 0.216, 0, 0, 0]
+
+cvCfg:
+  imagePath: "input.jpg"
