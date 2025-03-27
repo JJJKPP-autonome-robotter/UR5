@@ -1,39 +1,37 @@
+#ifndef CONFIG_FILE_HPP
+#define CONFIG_FILE_HPP
+
 #pragma once
+
+#include <iostream>
+#include <yaml-cpp/yaml.h>
 #include <fstream>
-#include <string>
-#include <vector>
-#include <functional>
-#include <stdexcept>
-#include <cstdio> // For std::remove and std::rename
 
-// Define a struct to represent a single data entry
-struct Data {
-    int b;
-    int c;
-    int d;
-};
+using namespace std;
 
-class DataSaver {
-private:
-    std::string filename;
-    std::vector<Data> data; // Store all data in memory
-
+class ConfigFile {
 public:
-    // Constructor to initialize the file name
-    DataSaver(const std::string& file);
+    ConfigFile();
+    ~ConfigFile();
+    explicit ConfigFile(string);
 
-    // Function to read all data from the file into memory
-    void readData();
+    template<typename T>
+    T get(string key, string key1) const {
+        if (config[key][key1]) return config[key][key1].as<T>();
+        throw runtime_error("Config file is missing: " + key);
+    }
 
-    // Function to add a new data set
-    void addData(const Data& newData);
+    template<typename T>
+    void set(string key, string key1, const T& value) {
+        config[key][key1] = value;
+    }
 
-    // Function to modify data programmatically
-    void modifyData(const std::function<void(std::vector<Data>&)>& modifier);
+    void save() const;
 
-    // Function to write all data back to the file
-    void writeData();
+private:
+    string fileName;
+    YAML::Node config;
 
-    // Getter for the data (optional, for debugging or external use)
-    const std::vector<Data>& getData() const;
 };
+
+#endif
