@@ -20,6 +20,12 @@ To verify the installation, run<br>
 pkg-config --modversion opencv4
 ```
 
+### YAML Config Library
+Install yaml-cpp library: <br>
+```bash
+    sudo apt install libyaml-cpp-dev
+```
+
 
 ### Robot setup
 To control the robot over Ethernet. Make sure to install the URCap External Control.<br>
