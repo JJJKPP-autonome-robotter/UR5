@@ -183,6 +183,9 @@ bool RobotArm::confirmPoint(vector<double>& refPoint) {
             
             vector<double> newRefPoint = rtdeReceive->getTargetTCPPose();
             refPoint = newRefPoint;
+            refPoint[3] = 3.14;
+            refPoint[4] = 0;
+            refPoint[5] = 0;
 
             // Print out new ref point
             cout << "New point is: ";
