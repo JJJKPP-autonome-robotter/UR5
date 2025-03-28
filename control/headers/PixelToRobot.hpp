@@ -20,22 +20,26 @@ public:
     void findPoints();
     void showResults();
     vector<Point2f> getCenters() const;
-    void calibrate(const vector<double>& refPoint1, const vector<double>& refPoint2, const vector<double>& refPoint3); 
+    void calibrate(); 
 
     // Transform a pixel coordinate to a robot coordinate
     Point2f transformPoint(const Point2f& pixelPoint) const;
 
+    void computeTransformation(const vector<double> &refPoint1, const vector<double> &refPoint2, const vector<double> &refPoint3);
+
+    vector<Point2f> centers;
+
+    
+
 private:
     void preprocess();
     void detectContours(); 
-    void computeTransformation(const vector<Point2f>& pixelPoints, 
-                               const vector<Point2f>& robotPoints);
-
+    
     Mat image;
     Mat hsv;
     Mat mask;
     Mat output;
-    vector<Point2f> centers; 
+    
 
     Mat affineMatrix;  // Transformation matrix storage
 };

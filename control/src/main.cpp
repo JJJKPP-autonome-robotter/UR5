@@ -42,6 +42,13 @@ int main() {
 	RobotArm ur5 = RobotArm(ip, velocity, acceleration, dt, lookaheadTime, gain, basePos, gripper);
 	ur5.connect();
 
+	string imagePath = cfg.get<string>("cvCfg", "imagePath"); // get path to image
+
+	PixelToRobot pixelToRobot(imagePath); // init pixelToRobot Class
+
+	pixelToRobot.calibrate();  // find cali points
+	pixelToRobot.showResults(); // DEBUG and show them.
+
 	// Calibrating robot 
 	// Set Refpoints
 	vector<double> refPoint1 = cfg.get<vector<double>>("robotCfg","refPoint1");
@@ -78,8 +85,7 @@ int main() {
 		cfg.save();
 	}
 	
-	string imagePath = cfg.get<string>("cvCfg","imagePath"); 
-
+	
   // tager billed
     CaptureImage camera(4);
     
@@ -103,7 +109,7 @@ int main() {
     Point2f mmCenter = centers[0];
 
    // beregn koordinater
-    PixelToRobot pixelToRobot(imagePath);
+    
 
 	refPoint1 = ur5.getRefPoint1();
 	refPoint2 = ur5.getRefPoint2();
@@ -122,9 +128,10 @@ int main() {
 	}
 	cout << endl;
 
-    pixelToRobot.calibrate(refPoint1, refPoint2, refPoint3);
+	
 
-    pixelToRobot.showResults(); // DEBUG
+	pixelToRobot.computeTransformation(refPoint1, refPoint2, refPoint3); // takes 3 cali points and makes trans-matrix
+
     Point2f robotCoord = pixelToRobot.transformPoint(mmCenter);
 
     // Output result

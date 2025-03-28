@@ -75,26 +75,17 @@ void PixelToRobot::detectContours() {  // Renamed from findContours
         return distanceFromOrigin(a) < distanceFromOrigin(b);
     });
 
-    // print centers
     cout << "Sorted Centers:" << std::endl;
-    for (const auto& center : centers) {
-        cout << "(" << center.x << ", " << center.y << ")" << std::endl;
-    }
-
-    // draw centers on output
-    for (const auto& center : centers) {
-        circle(output, center, 3, Scalar(0, 255, 0), -1);  // size 3 and color green
+    for (size_t i = 0; i < centers.size(); ++i) {
+        cout << "Center " << i + 1 << ": (" << centers[i].x << ", " << centers[i].y << ")" << std::endl;
+        putText(output, std::to_string(i + 1), centers[i], FONT_HERSHEY_SIMPLEX, 1, Scalar(0, 255, 0), 2);
     }
 }
 
 
 // combine
-void PixelToRobot::calibrate(const vector<double>& refPoint1, const vector<double>& refPoint2, const vector<double>& refPoint3) {
-    vector<Point2f> robotPoints = {
-        Point2f(refPoint1[0], refPoint1[1]),
-        Point2f(refPoint2[0], refPoint2[1]),
-        Point2f(refPoint3[0], refPoint3[1])
-    };
+void PixelToRobot::calibrate() {
+   
 
     preprocess();
     detectContours();
@@ -104,9 +95,6 @@ void PixelToRobot::calibrate(const vector<double>& refPoint1, const vector<doubl
         cerr << "Error: Calibration failed. Need exactly 3 detected centers, but found " << centers.size() << "." << endl;
         return;
     }
-
-    // Compute transformation matrix using detected centers and predefined robot coordinates
-    computeTransformation(centers, robotPoints);
 
     cout << "Calibration done successfully!" << endl;
 }
@@ -124,10 +112,16 @@ vector<Point2f> PixelToRobot::getCenters() const {
 }
 
 // Constructor: Computes the affine transformation matrix
-void PixelToRobot::computeTransformation(const vector<Point2f>& pixelPoints, 
-                                         const vector<Point2f>& robotPoints) {
-    if (pixelPoints.size() == 3 && robotPoints.size() == 3) {
-        affineMatrix = getAffineTransform(pixelPoints, robotPoints);
+void PixelToRobot::computeTransformation(const vector<double> &refPoint1, const vector<double> &refPoint2, const vector<double> &refPoint3)
+{
+
+    vector<Point2f> robotPoints = {
+        Point2f(refPoint1[0], refPoint1[1]),
+        Point2f(refPoint2[0], refPoint2[1]),
+        Point2f(refPoint3[0], refPoint3[1])};
+
+    if (centers.size() == 3 && centers.size() == 3) {
+        affineMatrix = getAffineTransform(centers, robotPoints);
     } else {
         throw runtime_error("Exactly 3 points are required for affine transformation.");
     }
