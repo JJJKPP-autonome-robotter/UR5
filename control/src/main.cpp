@@ -33,9 +33,10 @@ int main() {
 	// Gripper variables
 	uint32_t gripperPortBaudrate = cfg.get<uint32_t>("gripperCfg","baudrate");
 	vector<double> tcpOffset = cfg.get<vector<double>>("gripperCfg","tcpOffset");
+	double payload = cfg.get<double>("gripperCfg","payload");
 
 	// Init gripper
-	Gripper* gripper = new Gripper(gripperPortBaudrate, tcpOffset);
+	Gripper* gripper = new Gripper(gripperPortBaudrate, tcpOffset, payload);
 
 	// Init robot and connect
 	RobotArm ur5 = RobotArm(ip, velocity, acceleration, dt, lookaheadTime, gain, basePos, gripper);

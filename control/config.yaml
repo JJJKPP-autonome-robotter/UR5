@@ -20,6 +20,7 @@ robotCfg:
 gripperCfg:
   baudrate: 115200
   tcpOffset: [0, 0, 0.216, 0, 0, 0]
+  payload: 0.5
 
 cvCfg:
   imagePath: "input.jpg"

@@ -6,10 +6,11 @@ Gripper::~Gripper() {
 }
 
 // Constructor
-Gripper::Gripper(uint32_t _baudrate, vector<double> _offset) : port(io) {
+Gripper::Gripper(uint32_t _baudrate, vector<double> _offset, double _payload) : port(io) {
     portName = findPort(); // Get device addres
     baudrate = _baudrate;
     offset = _offset;
+    payload = _payload;
 
     // Check if device was found
     if (portName.empty()) throw runtime_error("No valid device found");
@@ -119,4 +120,8 @@ string Gripper::findPort() {
 
 vector<double> Gripper::getOffset() {
     return offset;
+}
+
+double Gripper::getPayload() {
+    return payload;
 }
