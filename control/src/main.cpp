@@ -54,6 +54,10 @@ int main() {
 	cin >> in;
 	if (in == 'y') {
 		ur5.validateRefPoints();
+		cfg.set<vector<double>>("robotCfg","refPoint1",ur5.getRefPoint1);
+		cfg.set<vector<double>>("robotCfg","refPoint2",ur5.getRefPoint2);
+		cfg.set<vector<double>>("robotCfg","refPoint3",ur5.getRefPoint3);
+		cfg.save();
 	}
 
 	// Set Drop points
