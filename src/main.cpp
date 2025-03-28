@@ -42,6 +42,19 @@ int main() {
 	RobotArm ur5 = RobotArm(ip, velocity, acceleration, dt, lookaheadTime, gain, basePos, gripper);
 	ur5.connect();
 
+	// init camara
+	CaptureImage camera(4);
+
+	// take first image
+	if (camera.captureAndSave("input.jpg"))
+	{
+		cout << "Image successfully captured and saved!" << endl;
+	}
+	else
+	{
+		cerr << "Failed to capture image." << endl;
+	}
+
 	string imagePath = cfg.get<string>("cvCfg", "imagePath"); // get path to image
 
 	PixelToRobot pixelToRobot(imagePath); // init pixelToRobot Class
@@ -90,9 +103,8 @@ int main() {
 	
 	// main loop
 	while (true){
-		// tager billed
-		CaptureImage camera(4);
 		
+		// takes new image
 		if (camera.captureAndSave("input.jpg")) {
 			cout << "Image successfully captured and saved!" << endl;
 		} else {
