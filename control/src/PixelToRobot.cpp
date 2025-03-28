@@ -105,6 +105,7 @@ void PixelToRobot::showResults() {
     imshow("calibrate points", output);
 
     waitKey(0);
+    destroyAllWindows();
 }
 
 vector<Point2f> PixelToRobot::getCenters() const {

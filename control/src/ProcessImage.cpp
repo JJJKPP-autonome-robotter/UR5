@@ -131,6 +131,7 @@ void ProcessImage::showResults() {
     imshow("Detected Red M&Ms", output);
 
     waitKey(0);
+    destroyAllWindows();
 }
 
 vector<Point> ProcessImage::getCenters() const {
