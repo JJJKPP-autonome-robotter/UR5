@@ -71,6 +71,9 @@ int main() {
 		cfg.save();
 	}
 
+	// Set the transformation matrix
+	pixelToRobot.computeTransformation(refPoint1, refPoint2, refPoint3); // takes 3 cali points and makes trans-matrix
+
 	// Set Drop points
 	unordered_map<string, vector<double>> dropPoints = cfg.get<unordered_map<string, vector<double>>>("robotCfg","dropPoints");
 	ur5.setDropPoints(dropPoints);
@@ -85,65 +88,59 @@ int main() {
 		cfg.save();
 	}
 	
+	// main loop
+	while (true){
+		// tager billed
+		CaptureImage camera(4);
+		
+		if (camera.captureAndSave("input.jpg")) {
+			cout << "Image successfully captured and saved!" << endl;
+		} else {
+			cerr << "Failed to capture image." << endl;
+		}
+
+		// 
+		ProcessImage processor(imagePath);
+		processor.detectMMS("red");
+		processor.showResults(); // DEBUG
+
+		vector<Point> centers = processor.getCenters();
+		cout << "Detected M&M centers:" << endl;
+		for (const auto& center : centers) {
+			cout << "(" << center.x << ", " << center.y << ")" << endl;
+		}
 	
-  // tager billed
-    CaptureImage camera(4);
-    
-    if (camera.captureAndSave("input.jpg")) {
-        cout << "Image successfully captured and saved!" << endl;
-    } else {
-        cerr << "Failed to capture image." << endl;
-    }
+		Point2f mmCenter = centers[0];
 
-    // 
-    ProcessImage processor(imagePath);
-    processor.detectMMS("red");
-    processor.showResults(); // DEBUG
+	// beregn koordinater
+		refPoint1 = ur5.getRefPoint1();
+		refPoint2 = ur5.getRefPoint2();
+		refPoint3 = ur5.getRefPoint3();
 
-    vector<Point> centers = processor.getCenters();
-    cout << "Detected M&M centers:" << endl;
-    for (const auto& center : centers) {
-        cout << "(" << center.x << ", " << center.y << ")" << endl;
-    }
-   
-    Point2f mmCenter = centers[0];
+		for (int i = 0; i < 6; i++) {
+			cout << refPoint1[i] << ", ";
+		}
+		cout << endl;
+		for (int i = 0; i < 6; i++) {
+			cout << refPoint2[i] << ", ";
+		}
+		cout << endl;
+		for (int i = 0; i < 6; i++) {
+			cout << refPoint3[i] << ", ";
+		}
+		cout << endl;
 
-   // beregn koordinater
-    
+		// Calculate the transformation matrix
+		Point2f robotCoord = pixelToRobot.transformPoint(mmCenter);
 
-	refPoint1 = ur5.getRefPoint1();
-	refPoint2 = ur5.getRefPoint2();
-	refPoint3 = ur5.getRefPoint3();
+		// Output result
+		cout << "Pixel (" << mmCenter.x << ", " << mmCenter.y << ") -> "
+			<< "Robot (" << robotCoord.x << ", " << robotCoord.y << ")" << endl;
 
-	for (int i = 0; i < 6; i++) {
-		cout << refPoint1[i] << ", ";
+		vector<double> mm = {robotCoord.x, robotCoord.y};
+
+		ur5.pickUp("red", mm);
 	}
-	cout << endl;
-	for (int i = 0; i < 6; i++) {
-		cout << refPoint2[i] << ", ";
-	}
-	cout << endl;
-	for (int i = 0; i < 6; i++) {
-		cout << refPoint3[i] << ", ";
-	}
-	cout << endl;
-
-	
-
-	pixelToRobot.computeTransformation(refPoint1, refPoint2, refPoint3); // takes 3 cali points and makes trans-matrix
-
-    Point2f robotCoord = pixelToRobot.transformPoint(mmCenter);
-
-    // Output result
-    cout << "Pixel (" << mmCenter.x << ", " << mmCenter.y << ") -> "
-        << "Robot (" << robotCoord.x << ", " << robotCoord.y << ")" << endl;
-
-	vector<double> mm = {robotCoord.x, robotCoord.y};
-
-	ur5.pickUp("red", mm);
-	// Launch GUI, take user input
-	
-	// Main Loop going until finished.
 
     return 0;
 }
