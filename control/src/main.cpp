@@ -46,7 +46,7 @@ int main() {
 	// Set Refpoints
 	vector<double> refPoint1 = cfg.get<vector<double>>("robotCfg","refPoint1");
 	vector<double> refPoint2 = cfg.get<vector<double>>("robotCfg","refPoint2");
-	vector<double> refPoint3 = cfg.get<vector<double>>("robotCfg","refpoint3");
+	vector<double> refPoint3 = cfg.get<vector<double>>("robotCfg","refPoint3");
 	ur5.setRefPoints(refPoint1, refPoint2, refPoint3);
 
 	// Ask for validation of ref points
@@ -78,7 +78,7 @@ int main() {
 		cfg.save();
 	}
 	
-	string imagePath = cfg.get<string>("cvCfg","inmagePath"); 
+	string imagePath = cfg.get<string>("cvCfg","imagePath"); 
 
   // tager billed
     CaptureImage camera(4);
@@ -130,6 +130,10 @@ int main() {
     // Output result
     cout << "Pixel (" << mmCenter.x << ", " << mmCenter.y << ") -> "
         << "Robot (" << robotCoord.x << ", " << robotCoord.y << ")" << endl;
+
+	vector<double> mm = {robotCoord.x, robotCoord.y};
+
+	ur5.pickUp("red", mm);
 	// Launch GUI, take user input
 	
 	// Main Loop going until finished.

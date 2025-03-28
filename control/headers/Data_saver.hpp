@@ -18,7 +18,7 @@ public:
     template<typename T>
     T get(string key, string key1) const {
         if (config[key][key1]) return config[key][key1].as<T>();
-        throw runtime_error("Config file is missing: " + key);
+        throw runtime_error("Config file is missing: " + key + ", " + key1);
     }
 
     template<typename T>
