@@ -44,6 +44,7 @@ void PixelToRobot::detectContours() {  // Renamed from findContours
                                                                         // CHAIN_APPROX_SIMPLE removes redundant points 
 
     const double minArea = 5000.0; // contour less than 6000 pixels ignored
+    const double maxArea = 10000.0;
 
     centers.clear();
 
@@ -51,7 +52,7 @@ void PixelToRobot::detectContours() {  // Renamed from findContours
 
         // filter smal contours
         double area = contourArea(contour); 
-        if (area < minArea) {  
+        if (area < minArea || area > maxArea) {
             continue;
         }
 
