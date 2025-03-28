@@ -101,6 +101,9 @@ int main() {
 		cfg.save();
 	}
 	
+	string color = "yellow"; // color of M&M to detect
+
+
 	// main loop
 	while (true){
 		
@@ -113,7 +116,7 @@ int main() {
 
 		// 
 		ProcessImage processor(imagePath);
-		processor.detectMMS("red");
+		processor.detectMMS(color);
 		processor.showResults(); // DEBUG
 
 		vector<Point> centers = processor.getCenters();
@@ -151,7 +154,7 @@ int main() {
 
 		vector<double> mm = {robotCoord.x, robotCoord.y};
 
-		ur5.pickUp("red", mm);
+		ur5.pickUp(color, mm);
 	}
 
     return 0;
