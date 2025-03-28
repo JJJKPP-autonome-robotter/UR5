@@ -69,6 +69,8 @@ int main() {
 	cin >> in;
 	if (in == 'y') {
 		ur5.validateDropPoints();
+		cfg.set<unordered_map<string, vector<double>>>("robotCfg","dropPoints",ur5.getDropPoints);
+		cfg.save();
 	}
 	
 	string imagePath = cfg.get<string>("cvCfg","inmagePath"); 

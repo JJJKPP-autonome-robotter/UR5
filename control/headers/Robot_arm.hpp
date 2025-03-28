@@ -38,6 +38,7 @@ public:
     vector<double> getRefPoint1(); // Ref point 1 vector<double> {x, y, z, rx, ry, rz}
     vector<double> getRefPoint2(); // Ref point 2 vector<double> {x, y, z, rx, ry, rz}
     vector<double> getRefPoint3(); // Ref point 3 vector<double> {x, y, z, rx, ry, rz}
+    unordered_map<string, vector<double>> getDropPoints(); // Drop points unordered map color : vector<double> {x, y, z, rx, ry, rz}
 
     // Setters
     void setVelocity(double); // Velocity double

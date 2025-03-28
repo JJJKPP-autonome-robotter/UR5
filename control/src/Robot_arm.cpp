@@ -275,6 +275,10 @@ vector<double> RobotArm::getRefPoint3(){
     return refPoint3;
 }
 
+unordered_map<string, vector<double>> RobotArm::getDropPoints() {
+    return dropPoints;
+}
+
 // Setters
 // Sets velocity in Robot_arm to the variable "v"
 void RobotArm::setVelocity(double v){
