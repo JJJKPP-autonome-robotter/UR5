@@ -55,9 +55,12 @@ int main() {
 	cin >> in;
 	if (in == 'y') {
 		ur5.validateRefPoints();
-		cfg.set<vector<double>>("robotCfg","refPoint1",ur5.getRefPoint1);
-		cfg.set<vector<double>>("robotCfg","refPoint2",ur5.getRefPoint2);
-		cfg.set<vector<double>>("robotCfg","refPoint3",ur5.getRefPoint3);
+		refPoint1 = ur5.getRefPoint1();
+		refPoint2 = ur5.getRefPoint2();
+		refPoint3 = ur5.getRefPoint3();
+		cfg.set<vector<double>>("robotCfg","refPoint1",refPoint1);
+		cfg.set<vector<double>>("robotCfg","refPoint2",refPoint2);
+		cfg.set<vector<double>>("robotCfg","refPoint3",refPoint3);
 		cfg.save();
 	}
 
@@ -70,7 +73,8 @@ int main() {
 	cin >> in;
 	if (in == 'y') {
 		ur5.validateDropPoints();
-		cfg.set<unordered_map<string, vector<double>>>("robotCfg","dropPoints",ur5.getDropPoints);
+		dropPoints = ur5.getDropPoints();
+		cfg.set<unordered_map<string, vector<double>>>("robotCfg","dropPoints",dropPoints);
 		cfg.save();
 	}
 	
