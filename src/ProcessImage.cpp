@@ -14,7 +14,7 @@ ProcessImage::ProcessImage(const string& imagePath) {
     colorRanges["red"] = { Scalar(0, 120, 100), Scalar(10, 255, 255) };
     colorRanges["red2"] = { Scalar(170, 120, 100), Scalar(180, 255, 255) };  // Second red range
     colorRanges["blue"] = {Scalar(100, 150, 100), Scalar(110, 255, 255)};
-    colorRanges["green"] = { Scalar(40, 40, 40), Scalar(90, 255, 255) };
+    colorRanges["green"] = {Scalar(50, 100, 160), Scalar(60, 180, 255)};
     colorRanges["orange"] = { Scalar(10, 180, 100), Scalar(18, 255, 255) };
     colorRanges["yellow"] = { Scalar(19, 150, 120), Scalar(26, 255, 255) };
     colorRanges["brown"] = { Scalar(8, 150, 40), Scalar(14, 255, 120) };
@@ -61,7 +61,6 @@ void ProcessImage::detectContours() {  // Renamed from findContours
     const double maxArea = 4000.0;
     const double maxAspectRatio = 1.40; // contour with aspect ratio greater than 1.3 processed as 2 centers
 
-    centers.clear();
 
     for (const auto& contour : contours) {  // for each contour
 
@@ -113,8 +112,31 @@ void ProcessImage::detectContours() {  // Renamed from findContours
 
 // combine
 void ProcessImage::detectMMS(string color) {
+    centers.clear(); // clear previous centers
     preprocess(color);
     detectContours();
+}
+
+// detect all colors
+Point ProcessImage::detectAll(const vector<string> &selectedColors){
+    centers.clear(); // clear previous points
+
+    for (const auto &color : selectedColors){
+        preprocess(color);
+        detectContours();
+    }
+
+    // sort centers by y and x coordinates
+    sort(centers.begin(), centers.end(), [](const Point& a, const Point& b) {
+        return (a.y < b.y) || (a.y == b.y && a.x < b.x);
+    });
+
+
+    // return the first center
+    if (centers.empty()) {
+        throw runtime_error("No centers detected.");
+    }
+    return centers[0];
 }
 
 // show output

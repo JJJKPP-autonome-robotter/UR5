@@ -16,6 +16,7 @@ public:
     void detectMMS(string color);
     void showResults();
     vector<Point> getCenters() const;
+    Point detectAll(const vector<string> &selectedColors);
 
 private:
     void preprocess(string color);
