@@ -101,7 +101,7 @@ int main() {
 		cfg.save();
 	}
 	
-	string color = "yellow"; // color of M&M to detect
+	string color = "blue"; // color of M&M to detect
 
 
 	// main loop

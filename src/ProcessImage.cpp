@@ -13,7 +13,7 @@ ProcessImage::ProcessImage(const string& imagePath) {
 
     colorRanges["red"] = { Scalar(0, 120, 100), Scalar(10, 255, 255) };
     colorRanges["red2"] = { Scalar(170, 120, 100), Scalar(180, 255, 255) };  // Second red range
-    colorRanges["blue"] = { Scalar(100, 150, 100), Scalar(140, 255, 255) };
+    colorRanges["blue"] = {Scalar(100, 150, 100), Scalar(110, 255, 255)};
     colorRanges["green"] = { Scalar(40, 40, 40), Scalar(90, 255, 255) };
     colorRanges["orange"] = { Scalar(10, 180, 100), Scalar(18, 255, 255) };
     colorRanges["yellow"] = { Scalar(19, 150, 120), Scalar(26, 255, 255) };
