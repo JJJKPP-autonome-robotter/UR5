@@ -51,92 +51,79 @@ void ProcessImage::preprocess(string color) {
 }
 
 
-// find contours
-void ProcessImage::detectContours() {  // Renamed from findContours
+// vector of points with color
+vector<pair<Point, string>> centers;
+
+
+void ProcessImage::detectContours(const string& color) {
     vector<vector<Point>> contours;
-    findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);   // RETR_EXTERNAL = only external contours
-                                                                        // CHAIN_APPROX_SIMPLE removes redundant points 
+    findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
-    const double minArea = 1000.0; // contour less than 50 pixels ignored
+    const double minArea = 1000.0;
     const double maxArea = 4000.0;
-    const double maxAspectRatio = 1.40; // contour with aspect ratio greater than 1.3 processed as 2 centers
+    const double maxAspectRatio = 1.40;
 
-
-    for (const auto& contour : contours) {  // for each contour
-
-        // filter smal contours
-        double area = contourArea(contour); 
+    for (const auto& contour : contours) {
+        double area = contourArea(contour);
         if (area < minArea || area > maxArea) {
             continue;
         }
 
-        // NOTE: vi har brug for bedre måde end rectangle, prøv cirkel?
-        Rect boundingBox = boundingRect(contour); // rectangel around contour   
-
-        // check aspect ratio
+        Rect boundingBox = boundingRect(contour);
         double aspectRatio = static_cast<double>(max(boundingBox.width, boundingBox.height)) /
                              static_cast<double>(min(boundingBox.width, boundingBox.height));
 
-
-        // if aspect ratio is greater than maxAspectRatio, asume 2 centers
         if (aspectRatio > maxAspectRatio) {
-
-            // calculate centers
-            // if width is greater than height
             if (boundingBox.width > boundingBox.height) {
                 Point center1(boundingBox.x + boundingBox.width / 4, boundingBox.y + boundingBox.height / 2);
                 Point center2(boundingBox.x + 3 * boundingBox.width / 4, boundingBox.y + boundingBox.height / 2);
-                centers.push_back(center1);
-                centers.push_back(center2);
-            } else { 
-                // if height is greater than width
+                centers.emplace_back(center1, color);
+                centers.emplace_back(center2, color);
+            } else {
                 Point center1(boundingBox.x + boundingBox.width / 2, boundingBox.y + boundingBox.height / 4);
                 Point center2(boundingBox.x + boundingBox.width / 2, boundingBox.y + 3 * boundingBox.height / 4);
-                centers.push_back(center1);
-                centers.push_back(center2);
+                centers.emplace_back(center1, color);
+                centers.emplace_back(center2, color);
             }
         } else {
-            // if aspect ratio is less than maxAspectRatio, asume 1 center
             Point center(boundingBox.x + boundingBox.width / 2, boundingBox.y + boundingBox.height / 2);
-            centers.push_back(center);
+            centers.emplace_back(center, color);
         }
     }
 
-
-    // draw centers on output
     for (const auto& center : centers) {
-        circle(output, center, 3, Scalar(0, 255, 0), -1);  // size 3 and color green
+        circle(output, center.first, 3, Scalar(0, 255, 0), -1);
     }
 }
 
 
-// combine
+// detect specific color
+// stored in centers
 void ProcessImage::detectMMS(string color) {
     centers.clear(); // clear previous centers
     preprocess(color);
-    detectContours();
+    detectContours(color);
 }
 
-// detect all colors
-Point ProcessImage::detectAll(const vector<string> &selectedColors){
+// detectAll to return the point with the color
+pair<Point, string> ProcessImage::detectAll(const vector<string>& selectedColors) {
     centers.clear(); // clear previous points
 
-    for (const auto &color : selectedColors){
+    for (const auto &color : selectedColors) {
         preprocess(color);
-        detectContours();
+        detectContours(color); 
     }
 
     // sort centers by y and x coordinates
-    sort(centers.begin(), centers.end(), [](const Point& a, const Point& b) {
-        return (a.y < b.y) || (a.y == b.y && a.x < b.x);
+    sort(centers.begin(), centers.end(), [](const pair<Point, string>& a, const pair<Point, string>& b) {
+        return (a.first.y < b.first.y) || (a.first.y == b.first.y && a.first.x < b.first.x);
     });
 
-
-    // return the first center
+    // return the first center with its color
     if (centers.empty()) {
         throw runtime_error("No centers detected.");
     }
-    return centers[0];
+    return centers[0]; // Return the first center and color
 }
 
 // show output
@@ -156,6 +143,7 @@ void ProcessImage::showResults() {
     destroyAllWindows();
 }
 
-vector<Point> ProcessImage::getCenters() const {
+// Update getCenters to return the updated structure
+vector<pair<Point, string>> ProcessImage::getCenters() const {
     return centers;
 }

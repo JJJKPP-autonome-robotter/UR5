@@ -15,18 +15,18 @@ public:
     ProcessImage(const string& imagePath);
     void detectMMS(string color);
     void showResults();
-    vector<Point> getCenters() const;
-    Point detectAll(const vector<string> &selectedColors);
+    vector<pair<Point, string>> getCenters() const;  // Updated to return Point and color
+    pair<Point, string> detectAll(const vector<string> &selectedColors);  // Updated to return Point and color as a pair
 
 private:
     void preprocess(string color);
-    void detectContours();  // New
+    void detectContours(const string& color);  // Updated to accept color as a parameter
 
     Mat image;
     Mat hsv;
     Mat mask;
     Mat output;
-    vector<Point> centers;
+    vector<pair<Point, string>> centers;  // Updated to store Point and color
     map<string, pair<Scalar, Scalar>> colorRanges;
 };
 
