@@ -10,6 +10,8 @@
 using namespace cv;
 using namespace std;
 
+class ConfigFile;
+
 class ProcessImage {
 public:
     ProcessImage(const string& imagePath);
@@ -17,8 +19,9 @@ public:
     void showResults();
     vector<pair<Point, string>> getCenters() const;  // Updated to return Point and color
     pair<Point, string> detectAll(const vector<string> &selectedColors);  // Updated to return Point and color as a pair
+    void setHsvRange(ConfigFile* cfg);
 
-private:
+   private:
     void preprocess(string color);
     void detectContours(const string& color);  // Updated to accept color as a parameter
 

@@ -1,5 +1,5 @@
 #include "../headers/ProcessImage.hpp"  // Include the header
-
+#include "../headers/Data_saver.hpp" 
 
 // load image =D
 ProcessImage::ProcessImage(const string& imagePath) { 
@@ -9,18 +9,55 @@ ProcessImage::ProcessImage(const string& imagePath) {
         exit(1);
     }
     output = image.clone(); 
-
-
-    colorRanges["red"] = { Scalar(0, 120, 100), Scalar(10, 255, 255) };
-    colorRanges["red2"] = { Scalar(170, 120, 100), Scalar(180, 255, 255) };  // Second red range
-    colorRanges["blue"] = {Scalar(100, 150, 100), Scalar(110, 255, 255)};
-    colorRanges["green"] = {Scalar(50, 100, 160), Scalar(60, 180, 255)};
-    colorRanges["orange"] = { Scalar(10, 180, 100), Scalar(18, 255, 255) };
-    colorRanges["yellow"] = { Scalar(19, 150, 120), Scalar(26, 255, 255) };
-    colorRanges["brown"] = { Scalar(8, 150, 40), Scalar(14, 255, 120) };
 }
 
+void ProcessImage::setHsvRange(ConfigFile* cfg) {
+    vector<vector<int>> allColorRanges;
 
+    // List of all color keys in the YAML file
+    vector<string> colorKeys = {"red", "red2", "blue", "green", "orange", "yellow", "brown"};
+
+    // Retrieve and combine all color ranges
+    for (const auto& color : colorKeys) {
+        vector<vector<int>> ranges = cfg->get<vector<vector<int>>>("color_ranges", color);
+        allColorRanges.insert(allColorRanges.end(), ranges.begin(), ranges.end());
+    }
+
+    colorRanges["red"] = { 
+        Scalar(allColorRanges[0][0], allColorRanges[0][1], allColorRanges[0][2]), 
+        Scalar(allColorRanges[1][0], allColorRanges[1][1], allColorRanges[1][2]) 
+    };
+
+    colorRanges["red2"] = { 
+        Scalar(allColorRanges[2][0], allColorRanges[2][1], allColorRanges[2][2]), 
+        Scalar(allColorRanges[3][0], allColorRanges[3][1], allColorRanges[3][2]) 
+    };
+    colorRanges["blue"] = { 
+        Scalar(allColorRanges[4][0], allColorRanges[4][1], allColorRanges[4][2]), 
+        Scalar(allColorRanges[5][0], allColorRanges[5][1], allColorRanges[5][2]) 
+    };
+
+    colorRanges["green"] = { 
+        Scalar(allColorRanges[6][0], allColorRanges[6][1], allColorRanges[6][2]), 
+        Scalar(allColorRanges[7][0], allColorRanges[7][1], allColorRanges[7][2]) 
+    };
+
+    colorRanges["orange"] = { 
+        Scalar(allColorRanges[8][0], allColorRanges[8][1], allColorRanges[8][2]), 
+        Scalar(allColorRanges[9][0], allColorRanges[9][1], allColorRanges[9][2]) 
+    };
+
+    colorRanges["yellow"] = { 
+        Scalar(allColorRanges[10][0], allColorRanges[10][1], allColorRanges[10][2]), 
+        Scalar(allColorRanges[11][0], allColorRanges[11][1], allColorRanges[11][2]) 
+    };
+
+    colorRanges["brown"] = { 
+        Scalar(allColorRanges[12][0], allColorRanges[12][1], allColorRanges[12][2]), 
+        Scalar(allColorRanges[13][0], allColorRanges[13][1], allColorRanges[13][2]) 
+    };
+
+}
 // Preprocess the image, enhancer image
 void ProcessImage::preprocess(string color) {
     // convert image colors to hsv

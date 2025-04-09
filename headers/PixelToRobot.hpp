@@ -11,6 +11,8 @@
 using namespace cv;
 using namespace std;
 
+class ConfigFile;
+
 class PixelToRobot {
 public:
     // Constructor
@@ -20,7 +22,8 @@ public:
     void findPoints();
     void showResults();
     vector<Point2f> getCenters() const;
-    void calibrate(); 
+    void calibrate(ConfigFile* cfg);
+    void setHsvRange(ConfigFile* cfg);
 
     // Transform a pixel coordinate to a robot coordinate
     Point2f transformPoint(const Point2f& pixelPoint) const;
@@ -39,8 +42,9 @@ private:
     Mat hsv;
     Mat mask;
     Mat output;
-    
 
+    vector<vector<int>> red;
+    
     Mat affineMatrix;  // Transformation matrix storage
 };
 
