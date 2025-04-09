@@ -1,5 +1,5 @@
 robotCfg:
-  robotIp: 192.168.1.54
+  robotIp: 192.168.178.217
   refPoint1:
     - -0.039913101714169244
     - -0.55544114253907573
@@ -75,7 +75,29 @@ gripperCfg:
   tcpOffset: [0, 0, 0.216, 0, 0, 0]
   payload: 0.5
 cvCfg:
-  imagePath: input.jpg
+  imagePath: /home/jeppe/github/UR5/img/input41.jpg
   cameraPort: 4
   debug: true
   colorToPick: [red, orange]
+color_ranges:
+  red:
+    - [0, 120, 100]
+    - [10, 255, 255]
+  red2:
+    - [170, 120, 100]
+    - [180, 255, 255]
+  blue:
+    - [100, 150, 100]
+    - [110, 255, 255]
+  green:
+    - [50, 100, 160]
+    - [60, 180, 255]
+  orange:
+    - [10, 180, 100]
+    - [18, 255, 255]
+  yellow:
+    - [19, 150, 120]
+    - [26, 255, 255]
+  brown:
+    - [8, 150, 40]
+    - [14, 255, 120]
