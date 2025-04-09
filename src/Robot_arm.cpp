@@ -50,7 +50,9 @@ void RobotArm::connect() {
     rtdeControl->moveL(basePos);
 
     // Opens gripper
+    cout << "OPENING" << endl;
     gripper->open();
+    cout << "OPENED" << endl;
 }
 
 // validate ref points

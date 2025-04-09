@@ -32,6 +32,7 @@ bool Gripper::open() {
     send(message); // Send open message to gripper
 
     bool open = false;
+    cout << "Waiting for open" << endl;
     open = waitForTargetMessage("open"); // Waits for response from gripper
 
     if (open) cout << "OPEN" << endl;
