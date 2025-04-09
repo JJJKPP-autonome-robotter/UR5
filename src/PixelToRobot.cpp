@@ -1,49 +1,62 @@
 #include "../headers/PixelToRobot.hpp"
 
+#include "../headers/Data_saver.hpp"
+
 // load image =D
-PixelToRobot::PixelToRobot(const string& imagePath) { 
+PixelToRobot::PixelToRobot(const string& imagePath) {
     image = imread(imagePath);
     if (image.empty()) {
         cerr << "Error: Could not open or find the image!" << endl;
         exit(1);
     }
-    output = image.clone(); 
+    output = image.clone();
 }
 
+void PixelToRobot::setHsvRange(ConfigFile* cfg) {
+    red = cfg->get<vector<vector<int>>>("color_ranges", "red");                        // Get the first red range
+    vector<vector<int>> red2 = cfg->get<vector<vector<int>>>("color_ranges", "red2");  // Get the second red range
+
+    // Combine red2 into red
+    red.insert(red.end(), red2.begin(), red2.end());
+
+    // Print the combined red ranges for debugging
+    cout << "Combined red ranges:" << endl;
+    for (const auto& range : red) {
+        cout << "[" << range[0] << ", " << range[1] << ", " << range[2] << "]" << endl;
+    }
+}
 
 // Preprocess the image, enhancer image
 void PixelToRobot::preprocess() {
     // convert image colors to hsv
-    cvtColor(image, hsv, COLOR_BGR2HSV); 
+    cvtColor(image, hsv, COLOR_BGR2HSV);
 
     // Apply Gaussian blur to reduce noise
-    GaussianBlur(hsv, hsv, Size(5, 5), 0); // size is how much to blur
+    GaussianBlur(hsv, hsv, Size(5, 5), 0);  // size is how much to blur
 
     // define red color range
     // pixel in hsv range set to white else black
     Mat mask1, mask2;
-    inRange(hsv, Scalar(0, 120, 100), Scalar(10, 255, 255), mask1);    // red near 0°      Scalar(hue, saturation, value)
-    inRange(hsv, Scalar(170, 120, 100), Scalar(180, 255, 255), mask2); // red near 360°
+    inRange(hsv, Scalar(red[0][0], red[0][1], red[0][2]), Scalar(red[1][0], red[1][1], red[1][2]), mask1);  // red near 0°      Scalar(hue, saturation, value)
+    inRange(hsv, Scalar(red[2][0], red[2][1], red[2][2]), Scalar(red[3][0], red[3][1], red[3][2]), mask2);  // red near 360°
 
-    mask = mask1 | mask2; // combinere 2 masks (bitwise or)
+    mask = mask1 | mask2;  // combinere 2 masks (bitwise or)
 
-    // Apply morphological operations to clean mask 
+    // Apply morphological operations to clean mask
     // removes noise i 5x5 pixels
     Mat kernel = getStructuringElement(MORPH_RECT, Size(5, 5));
-    morphologyEx(mask, mask, MORPH_CLOSE, kernel); // removes samll holes
-    morphologyEx(mask, mask, MORPH_OPEN, kernel); // remove samll noise and isolate object
-    dilate(mask, mask, kernel, Point(-1, -1), 2); // extra iterations if needed
-
+    morphologyEx(mask, mask, MORPH_CLOSE, kernel);  // removes samll holes
+    morphologyEx(mask, mask, MORPH_OPEN, kernel);   // remove samll noise and isolate object
+    dilate(mask, mask, kernel, Point(-1, -1), 2);   // extra iterations if needed
 }
-
 
 // find contours
 void PixelToRobot::detectContours() {  // Renamed from findContours
     vector<vector<Point>> contours;
-    findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);   // RETR_EXTERNAL = only external contours
-                                                                        // CHAIN_APPROX_SIMPLE removes redundant points 
+    findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);  // RETR_EXTERNAL = only external contours
+                                                                       // CHAIN_APPROX_SIMPLE removes redundant points
 
-    const double minArea = 5000.0; // contour less than 6000 pixels ignored
+    const double minArea = 5000.0;  // contour less than 6000 pixels ignored
     const double maxArea = 10000.0;
 
     centers.clear();
@@ -51,19 +64,18 @@ void PixelToRobot::detectContours() {  // Renamed from findContours
     for (const auto& contour : contours) {  // for each contour
 
         // filter smal contours
-        double area = contourArea(contour); 
+        double area = contourArea(contour);
         if (area < minArea || area > maxArea) {
             continue;
         }
 
         // NOTE: vi har brug for bedre måde end rectangle, prøv cirkel?
-        Rect boundingBox = boundingRect(contour); // rectangel around contour   
+        Rect boundingBox = boundingRect(contour);  // rectangel around contour
 
         // if aspect ratio is less than maxAspectRatio, asume 1 center
         Point center(boundingBox.x + boundingBox.width / 2, boundingBox.y + boundingBox.height / 2);
         centers.push_back(center);
     }
-
 
     // afstand fra 0,0
     auto distanceFromOrigin = [](const Point& p) {
@@ -82,11 +94,9 @@ void PixelToRobot::detectContours() {  // Renamed from findContours
     }
 }
 
-
 // combine
-void PixelToRobot::calibrate() {
-   
-
+void PixelToRobot::calibrate(ConfigFile* cfg) {
+    setHsvRange(cfg);
     preprocess();
     detectContours();
 
@@ -113,9 +123,7 @@ vector<Point2f> PixelToRobot::getCenters() const {
 }
 
 // Constructor: Computes the affine transformation matrix
-void PixelToRobot::computeTransformation(const vector<double> &refPoint1, const vector<double> &refPoint2, const vector<double> &refPoint3)
-{
-
+void PixelToRobot::computeTransformation(const vector<double>& refPoint1, const vector<double>& refPoint2, const vector<double>& refPoint3) {
     vector<Point2f> robotPoints = {
         Point2f(refPoint1[0], refPoint1[1]),
         Point2f(refPoint2[0], refPoint2[1]),

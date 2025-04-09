@@ -53,12 +53,12 @@ void calibrateSystem() {
     // Initialize PixelToRobot
     string imagePath = cfg.get<string>("cvCfg", "imagePath");
     pixelToRobot = new PixelToRobot(imagePath);
-    pixelToRobot->calibrate();
+    pixelToRobot->calibrate(&cfg);
 
     if (DEBUG) {
         pixelToRobot->showResults();
     }
-    
+
     // Set reference points
     vector<double> refPoint1 = cfg.get<vector<double>>("robotCfg", "refPoint1");
     vector<double> refPoint2 = cfg.get<vector<double>>("robotCfg", "refPoint2");
@@ -110,9 +110,12 @@ pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
 
     // Process image
     string imagePath = cfg.get<string>("cvCfg", "imagePath");
-    ProcessImage processor(imagePath);
 
-    pair<Point, string> toPick = processor.detectAll(selectedColors);
+    ProcessImage processor(imagePath);
+    processor.setHsvRange(&cfg);
+
+    pair<Point, string>
+    toPick = processor.detectAll(selectedColors);
     vector<pair<Point, string>> centers = processor.getCenters();
 
 
