@@ -75,8 +75,8 @@ gripperCfg:
   tcpOffset: [0, 0, 0.216, 0, 0, 0]
   payload: 0.5
 cvCfg:
-  imagePath: /home/jeppe/github/UR5/img/input41.jpg
-  cameraPort: 4
+  imagePath: input.jpg
+  cameraPort: 0
   debug: true
   colorToPick: [red, orange]
 color_ranges:
@@ -101,3 +101,6 @@ color_ranges:
   brown:
     - [8, 150, 40]
     - [14, 255, 120]
+dataLogger:
+  active: true
+  dbFileNme: "../data_log"
