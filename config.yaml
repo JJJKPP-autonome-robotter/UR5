@@ -104,3 +104,4 @@ color_ranges:
 dataLogger:
   active: true
   dbFileNme: "../data_log"
+
