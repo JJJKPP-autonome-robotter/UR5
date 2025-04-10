@@ -1,14 +1,4 @@
-#include <iostream>
-#include <string>
-#include <unordered_map>
-#include <vector>
-
-#include "../headers/CaptureImage.hpp"
-#include "../headers/Data_saver.hpp"
-#include "../headers/Gripper.hpp"
-#include "../headers/PixelToRobot.hpp"
-#include "../headers/ProcessImage.hpp"
-#include "../headers/Robot_arm.hpp"
+#include "../headers/systemInit.hpp"
 
 using namespace std;
 
@@ -130,4 +120,10 @@ pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
     }
  
     return toPick; // return point and color
+}
+
+DataLogger initDataLogger() {
+    string dbFile = cfg.get<string>("dataLogger","dbFileName");
+    DataLogger db = DataLogger(dbFile);
+    return db;
 }

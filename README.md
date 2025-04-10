@@ -26,6 +26,12 @@ Install yaml-cpp library: <br>
     sudo apt install libyaml-cpp-dev
 ```
 
+### SQLite3
+For data collection install SQLite3
+```bash
+    sudo apt install libsqlite3-dev sqlite3
+```
+
 
 ### Robot setup
 To control the robot over Ethernet. Make sure to install the URCap External Control.<br>

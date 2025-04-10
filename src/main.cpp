@@ -2,7 +2,8 @@
 #include <string>
 #include <vector>
 
-#include "systemInit.cpp"
+#include "../headers/systemInit.hpp"
+
 
 using namespace std;
 
@@ -34,6 +35,8 @@ void mainLoop() {
 int main() {
     initializeRobot();
     calibrateSystem();
+    bool dbActive = cfg.get<bool>("dataLogger","active");
+    if (dbActive) DataLogger db = initDataLogger();
     mainLoop();
     return 0;
 }
