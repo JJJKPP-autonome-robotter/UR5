@@ -35,8 +35,8 @@ void mainLoop(bool dbActive, DataLogger& db) {
             vector<double>& dbRealCoord = mm;
             vector<double> dbPicCoord = {static_cast<double>(mmCenter.x), static_cast<double>(mmCenter.y)};
             string image = cfg.get<string>("vcCfg","imagePath");
-            cv::Mat mask = 
-            
+            cv::Mat mask = processor.getMask();
+
             db.logEvent(dbColor, dbRealCoord, dbPicCoord, image, mask);
         }
     }

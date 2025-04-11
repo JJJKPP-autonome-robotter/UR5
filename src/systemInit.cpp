@@ -9,6 +9,7 @@ Gripper *gripper;
 CaptureImage camera(cfg.get<int>("cvCfg", "cameraPort"));
 PixelToRobot *pixelToRobot;
 unordered_map<string, vector<double>> dropPoints;
+ProcessImage processor(cfg.get<string>("cvCfg", "imagePath"));
 
 // debug
 bool DEBUG = cfg.get<bool>("cvCfg", "debug");
@@ -99,10 +100,6 @@ pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
         return {Point(0, 0), ""};  // Indicate failure
     }
 
-    // Process image
-    string imagePath = cfg.get<string>("cvCfg", "imagePath");
-
-    ProcessImage processor(imagePath);
     processor.setHsvRange(&cfg);
 
     pair<Point, string>
