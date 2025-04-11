@@ -34,10 +34,11 @@ void mainLoop(bool dbActive, DataLogger& db) {
             string& dbColor = color;
             vector<double>& dbRealCoord = mm;
             vector<double> dbPicCoord = {static_cast<double>(mmCenter.x), static_cast<double>(mmCenter.y)};
-            string image = cfg.get<string>("vcCfg","imagePath");
+            string image = cfg.get<string>("cvCfg","imagePath");
             cv::Mat mask = processor.getMask();
 
             db.logEvent(dbColor, dbRealCoord, dbPicCoord, image, mask);
+            cout << "Saved data" << endl;
         }
     }
 }

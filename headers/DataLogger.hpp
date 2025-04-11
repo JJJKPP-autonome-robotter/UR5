@@ -20,6 +20,9 @@ public:
     ~DataLogger();
     DataLogger(const string&);
 
+    void beginTransaction();
+    void commitTransaction();
+
     bool logEvent(
         const string& color, 
         const vector<double>& realCord, 

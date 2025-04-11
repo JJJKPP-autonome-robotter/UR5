@@ -43,6 +43,9 @@ void initializeRobot() {
 void calibrateSystem() {
     // Initialize PixelToRobot
     string imagePath = cfg.get<string>("cvCfg", "imagePath");
+
+    camera.captureAndSave(imagePath);
+
     pixelToRobot = new PixelToRobot(imagePath);
     pixelToRobot->calibrate(&cfg);
 
