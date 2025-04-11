@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void mainLoop(bool dbActive) {
+void mainLoop(bool dbActive, DataLogger& db) {
     vector<string> selectedColors = cfg.get<vector<string>>("cvCfg", "colorToPick");
 
     while (true) {
@@ -46,7 +46,8 @@ int main() {
     initializeRobot();
     calibrateSystem();
     bool dbActive = cfg.get<bool>("dataLogger","active");
-    if (dbActive) DataLogger db = initDataLogger();
-    mainLoop(dbActive);
+    DataLogger db;
+    if (dbActive) db = initDataLogger();
+    mainLoop(dbActive, db);
     return 0;
 }

@@ -10,6 +10,7 @@
 #include <ctime>
 #include <vector>
 #include <opencv2/opencv.hpp>
+#include <opencv2/imgcodecs.hpp>
 
 using namespace std;
 
@@ -24,7 +25,7 @@ public:
         const vector<double>& realCord, 
         const vector<double>& picCord,
         const string& imagePath,
-        const string& maskPath
+        const cv::Mat& mask
     );
 
 private:

@@ -85,17 +85,19 @@ string DataLogger::vectorToString(const vector<double>& vector) {
 }
 
 vector<unsigned char> DataLogger::encodeImage(const string &path) {
-    ifstream file(path, ios::binary);
+    cv::Mat image = cv::imread(path, cv::IMREAD_COLOR);
 
-    if (!file) {
-        throw runtime_error("Cannot open file: " + path);
+    if (image.empty()) {
+        throw runtime_error("Cannot open image: " + path);
     }
 
-    return vector<unsigned char>((istreambuf_iterator<char>(file)), {});
+    vector<unsigned char> buffer;
+    cv::imencode(".jpg", image, buffer);
+    return buffer;
 }
 
 vector<unsigned char> DataLogger::encodeMask(const cv::Mat& mask) {
-    if (mask.empty()) throw runtime_error("Failed to load mask: " + path);
+    if (mask.empty()) throw runtime_error("Failed to load mask!");
 
     vector<unsigned char> buffer;
     cv::imencode(".jpg", mask, buffer);
@@ -126,16 +128,16 @@ bool DataLogger::logEvent(
         VALUES (?, ?, ?, ?, ?, ?, ?)
     )";
 
-    sqlite3_smt* stmt;
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
         cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
         return false;
     }
 
     sqlite3_bind_int(stmt, 1, runId);
     sqlite3_bind_text(stmt, 2, timeStamp, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 3, color.c_str(), -1 SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 4, realCords.c_str(), -1 SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, color.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, realCords.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 5, picCords.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_blob(stmt, 6, imageBlob.data(), imageBlob.size(), SQLITE_TRANSIENT);
     sqlite3_bind_blob(stmt, 7, maskBlob.data(), maskBlob.size(), SQLITE_TRANSIENT);
