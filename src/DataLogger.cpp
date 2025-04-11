@@ -1,6 +1,6 @@
 #include "../headers/DataLogger.hpp"
 
-DataLogger::DataLogger() {}
+DataLogger::DataLogger() : db(nullptr), runId(-1) {}
 DataLogger::~DataLogger() {
     if (db) {
         sqlite3_close(db);
@@ -13,6 +13,7 @@ DataLogger::DataLogger(const string& dbFile) {
     if (sqlite3_open(dbFileName.c_str(), &db)) {
         cerr << "Can't open data base: " << sqlite3_errmsg(db) << endl;
         db = nullptr;
+
     } else {
         if (createTables()) startNewRun();
     }
@@ -34,6 +35,8 @@ bool DataLogger::createTables() {
             color TEXT,
             realPos TEXT,
             picPos TEXT,
+            image BLOB,
+            mask BLOB,
             FOREIGN KEY(run_id) REFERENCES runs(id)
         );
     )";
@@ -81,7 +84,31 @@ string DataLogger::vectorToString(const vector<double>& vector) {
     return oss.str();
 }
 
-bool DataLogger::logEvent(const string &color, const vector<double> &realCord, const vector<double> &picCord) {
+vector<unsigned char> DataLogger::encodeImage(const string &path) {
+    ifstream file(path, ios::binary);
+
+    if (!file) {
+        throw runtime_error("Cannot open file: " + path);
+    }
+
+    return vector<unsigned char>((istreambuf_iterator<char>(file)), {});
+}
+
+vector<unsigned char> DataLogger::encodeMask(const cv::Mat& mask) {
+    if (mask.empty()) throw runtime_error("Failed to load mask: " + path);
+
+    vector<unsigned char> buffer;
+    cv::imencode(".jpg", mask, buffer);
+    return buffer;
+}
+
+bool DataLogger::logEvent(
+    const string& color, 
+    const vector<double>& realCord, 
+    const vector<double>& picCord, 
+    const string& image,
+    const cv::Mat& mask 
+) {
     if (!db || runId <= 0) return false;
 
     time_t now = time(0);
@@ -91,15 +118,33 @@ bool DataLogger::logEvent(const string &color, const vector<double> &realCord, c
     string realCords = vectorToString(realCord);
     string picCords = vectorToString(picCord);
 
-    string sql = "INSERT INTO pick_events (timeStamp, color, realCordX, realCordY, picCordX, picCordY) VALUES ('" + 
-        string(timeStamp) + "', '" + color + "', '" + realCords + "', '" + picCords + ");";
+    vector<unsigned char> imageBlob = encodeImage(image);
+    vector<unsigned char> maskBlob = encodeMask(mask);
 
-    char* errMsg = nullptr;
-    if (sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errMsg) != SQLITE_OK) {
-        cerr << "Insert failed: " << errMsg << endl;
-        sqlite3_free(errMsg);
+    string sql = R"(
+        INSERT INTO pick_events (run_id, timeStamp, color, realPos, picPos, image, mask)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    )";
+
+    sqlite3_smt* stmt;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << endl;
         return false;
     }
 
+    sqlite3_bind_int(stmt, 1, runId);
+    sqlite3_bind_text(stmt, 2, timeStamp, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, color.c_str(), -1 SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, realCords.c_str(), -1 SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 5, picCords.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_blob(stmt, 6, imageBlob.data(), imageBlob.size(), SQLITE_TRANSIENT);
+    sqlite3_bind_blob(stmt, 7, maskBlob.data(), maskBlob.size(), SQLITE_TRANSIENT);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        cerr << "Insert failed: " << sqlite3_errmsg(db) << endl;
+        return false;
+    }
+
+    sqlite3_finalize(stmt);
     return true;
 }

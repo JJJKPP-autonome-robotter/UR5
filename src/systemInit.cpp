@@ -91,7 +91,8 @@ void calibrateSystem() {
 
 pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
     // Capture and save image
-    if (camera.captureAndSave("input.jpg")) {
+    string imagePath = cfg.get<string>("cvCfg","imagePath");
+    if (camera.captureAndSave(imagePath)) {
         cout << "Image successfully captured and saved!" << endl;
     } else {
         cerr << "Failed to capture image." << endl;

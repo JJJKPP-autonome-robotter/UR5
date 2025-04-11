@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void mainLoop() {
+void mainLoop(bool dbActive) {
     vector<string> selectedColors = cfg.get<vector<string>>("cvCfg", "colorToPick");
 
     while (true) {
@@ -29,6 +29,16 @@ void mainLoop() {
 
         vector<double> mm = {robotCoord.x, robotCoord.y};
         ur5->pickUp(color, mm);
+
+        if (dbActive) {
+            string& dbColor = color;
+            vector<double>& dbRealCoord = mm;
+            vector<double> dbPicCoord = {static_cast<double>(mmCenter.x), static_cast<double>(mmCenter.y)};
+            string image = cfg.get<string>("vcCfg","imagePath");
+            cv::Mat mask = 
+            
+            db.logEvent(dbColor, dbRealCoord, dbPicCoord, image, mask);
+        }
     }
 }
 
@@ -37,6 +47,6 @@ int main() {
     calibrateSystem();
     bool dbActive = cfg.get<bool>("dataLogger","active");
     if (dbActive) DataLogger db = initDataLogger();
-    mainLoop();
+    mainLoop(dbActive);
     return 0;
 }

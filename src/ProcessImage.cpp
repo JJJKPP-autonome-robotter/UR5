@@ -184,3 +184,7 @@ void ProcessImage::showResults() {
 vector<pair<Point, string>> ProcessImage::getCenters() const {
     return centers;
 }
+
+Mat ProcessImage::getMask() {
+    return mask;
+}

@@ -9,6 +9,7 @@
 #include <string>
 #include <ctime>
 #include <vector>
+#include <opencv2/opencv.hpp>
 
 using namespace std;
 
@@ -18,7 +19,13 @@ public:
     ~DataLogger();
     DataLogger(const string&);
 
-    bool logEvent(const string& color, const vector<double>& realCord, const vector<double>& picCord);
+    bool logEvent(
+        const string& color, 
+        const vector<double>& realCord, 
+        const vector<double>& picCord,
+        const string& imagePath,
+        const string& maskPath
+    );
 
 private:
     string dbFileName;
@@ -28,6 +35,8 @@ private:
     bool createTables();
     bool startNewRun();
     string vectorToString(const vector<double>& vector);
+    vector<unsigned char> encodeImage(const string& path);
+    vector<unsigned char> encodeMask(const cv::Mat& mask);
 
 };
 
