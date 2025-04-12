@@ -139,16 +139,29 @@ string DataLogger::vectorToString(const vector<double>& vector) {
     return oss.str();
 }
 
-
-
-
-
 void DataLogger::beginTransaction() {
-    sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, nullptr);
+    if (!db) return;
+
+    if (sqlite3_get_autocommit(db) != 0) {
+        char* errMsg = nullptr;
+        if (sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, &errMsg) != SQLITE_OK) {
+            cerr << "Failed to begin transaction: " << errMsg << endl;
+            sqlite3_free(errMsg);
+        }
+    }
+    
 }
 
 void DataLogger::commitTransaction() {
-    sqlite3_exec(db, "COMMIT;", nullptr, nullptr, nullptr);
+    if (!db) return;
+
+    if (sqlite3_get_autocommit(db) == 0) {
+        char* errMsg = nullptr;
+        if (sqlite3_exec(db, "COMMIT;", nullptr, nullptr, &errMsg) != SQLITE_OK) {
+            cerr << "Failed to commit transaction: " << errMsg << endl;
+            sqlite3_free(errMsg);
+        }
+    }
 }
 
 bool DataLogger::logEvent(
@@ -158,7 +171,15 @@ bool DataLogger::logEvent(
     const string& image,
     const cv::Mat& mask 
 ) {
-    if (!db || runId <= 0) return false;
+    if (!db) {
+        cerr << "Database connection is null" << endl;
+        return false;
+    }
+    
+    if (runId <= 0) {
+        cerr << "Invalid run ID: " << runId << endl;
+        return false;
+    }
 
     time_t now = time(0);
     char timeStamp[100];
@@ -167,45 +188,80 @@ bool DataLogger::logEvent(
     string realCords = vectorToString(realCord);
     string picCords = vectorToString(picCord);
 
-    vector<unsigned char> imageBlob = encodeImage(image);
-    vector<unsigned char> maskBlob = encodeMask(mask);
+    beginTransaction();
 
-    string sql = "INSERT INTO pick_events (run_id, timeStamp, color, realPos, picPos, image, mask) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+    try {
+        vector<unsigned char> imageBlob;
+        vector<unsigned char> maskBlob;
 
-    sqlite3_stmt* stmt;
-    int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
+        try {
+            imageBlob = encodeImage(image);
+        } catch (const exception& e) {
+            cerr << "Error encoding image: " << e.what() << endl;
+        }
 
+        try {
+            maskBlob = encodeMask(mask);
+        } catch (const exception& e) {
+            cerr << "Error encoding mask: " << e.what() << endl;
+        }
 
-    if (rc != SQLITE_OK) {
-        cerr << "Failed to prepare statement (" << rc << "): " << sqlite3_errmsg(db) << endl;
-        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
-        return false;
-    }
+        cout << "Preparing to insert event:" << endl;
+        cout << "- Run ID: " << runId << endl;
+        cout << "- Color: " << color << endl;
+        cout << "- Real Coordinates: " << realCords << endl;
+        cout << "- Pic Coordinates: " << picCords << endl;
+        cout << "- Image Size: " << imageBlob.size() << " bytes" << endl;
+        cout << "- Mask Size: " << maskBlob.size() << " bytes" << endl;
 
-    sqlite3_bind_int(stmt, 1, runId);
-    sqlite3_bind_text(stmt, 2, timeStamp, -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 3, color.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 4, realCords.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(stmt, 5, picCords.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_blob(stmt, 6, imageBlob.data(), imageBlob.size(), SQLITE_TRANSIENT);
-    sqlite3_bind_blob(stmt, 7, maskBlob.data(), maskBlob.size(), SQLITE_TRANSIENT);
+        string sql = "INSERT INTO pick_events (run_id, timeStamp, color, realPos, picPos, image, mask) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    rc = sqlite3_step(stmt);
-    if (rc != SQLITE_DONE) {
-        cerr << "Insert failed (" << rc << "): " << sqlite3_errmsg(db) << endl;
+        sqlite3_stmt* stmt = nullptr;
+        int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
+
+        if (rc != SQLITE_OK) {
+            cerr << "Failed to prepare statement (" << rc << "): " << sqlite3_errmsg(db) << endl;
+            sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
+            return false;
+        }
+
+        if (sqlite3_bind_int(stmt, 1, runId) != SQLITE_OK) cerr << "Failed to bind run_id: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 2, timeStamp, -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind timeStamp: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 3, color.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind color: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 4, realCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind realPos: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 5, picCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind picPos: " << sqlite3_errmsg(db) << endl;
+        if (imageBlob.empty()) {
+            if (sqlite3_bind_null(stmt, 6) != SQLITE_OK) cerr << "Failed to bind null image: " << sqlite3_errmsg(db) << endl;
+        } else {
+            if (sqlite3_bind_blob(stmt, 6, imageBlob.data(), imageBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
+                cerr << "Failed to bind image: " << sqlite3_errmsg(db) << endl;
+        }
+        if (maskBlob.empty()) {
+            if (sqlite3_bind_null(stmt, 7) != SQLITE_OK) cerr << "Failed to bind null mask: " << sqlite3_errmsg(db) << endl;
+        } else {
+            if (sqlite3_bind_blob(stmt, 7, maskBlob.data(), maskBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
+                cerr << "Failed to bind mask: " << sqlite3_errmsg(db) << endl;
+        }
+
+        rc = sqlite3_step(stmt);
+
+        if (rc != SQLITE_DONE) {
+            cerr << "Insert failed (" << rc << "): " << sqlite3_errmsg(db) << endl;
+            sqlite3_finalize(stmt);
+            sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
+            return false;
+        }
+
         sqlite3_finalize(stmt);
-        sqlite3_exec(db, "ROLLBACK;", nullptr, nullptr, nullptr);
+
+        commitTransaction();
+
+        cout << "Successfully logged pick event with ID: " << sqlite3_last_insert_rowid(db) << endl;
+        return true;
+
+    } catch (const exception& e) {
+        cerr << "Exception in logEvent: " << e.what() << endl;
         return false;
     }
-
-    sqlite3_finalize(stmt);
-
-    if (sqlite3_exec(db, "COMMIT;", nullptr, nullptr, &errMsg) != SQLITE_OK) {
-        cerr << "Failed to commit transaction: " << errMsg << endl;
-        sqlite3_free(errMsg);
-        return false;
-    }
-
-    return true;
 }
