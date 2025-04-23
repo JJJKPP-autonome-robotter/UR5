@@ -28,7 +28,8 @@ void mainLoop(bool dbActive, DataLogger& db) {
              << "Robot (" << robotCoord.x << ", " << robotCoord.y << ")" << endl;
 
         vector<double> mm = {robotCoord.x, robotCoord.y};
-        ur5->pickUp(color, mm);
+        bool pickup = false;
+        pickup = ur5->pickUp(color, mm);
 
         if (dbActive) {
             string& dbColor = color;
@@ -54,7 +55,7 @@ void mainLoop(bool dbActive, DataLogger& db) {
                 hsvUpper.insert(hsv.end(), range[1].begin(), range[1].end());
             }
 
-            db.logEvent(dbColor, dbRealCoord, dbPicCoord, hsvLower, hsvUpper, image, mask);
+            db.logEvent(dbColor, pickup, dbRealCoord, dbPicCoord, hsvLower, hsvUpper, image, mask);
             cout << "Saved data" << endl;
         }
     }

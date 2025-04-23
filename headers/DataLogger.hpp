@@ -25,6 +25,7 @@ public:
 
     bool logEvent(
         const string& color, 
+        const bool& pickup,
         const vector<double>& realCord, 
         const vector<double>& picCord,
         const vector<double>& HL,
