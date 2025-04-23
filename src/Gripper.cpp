@@ -62,8 +62,8 @@ bool Gripper::pickup() {
         inputMessage = read(); // Reads from pico
 
         if (inputMessage == "error") return false;
-        if (inputMessage == "good") return true;
-        if (inputMessage == "bad") return false;
+        if (inputMessage == "true") return true;
+        if (inputMessage == "false") return false;
     }
 
     return false;
