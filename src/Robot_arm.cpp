@@ -201,7 +201,7 @@ bool RobotArm::confirmPoint(vector<double>& refPoint) {
     return false;
 }
 
-void RobotArm::pickUp(string color, vector<double> point) {
+bool RobotArm::pickUp(string color, vector<double> point) {
     double _velocity = 0.1; // Pick up velocity
 
     point.insert(point.end(), {0, 3.14, 0, 0}); // Add table height and tool rotation
@@ -215,6 +215,7 @@ void RobotArm::pickUp(string color, vector<double> point) {
 
     // Open gripper
     gripper->open();
+    pickStatus = false;
 
     // Lower to point
     rtdeControl->moveL(point, _velocity);
@@ -224,6 +225,13 @@ void RobotArm::pickUp(string color, vector<double> point) {
 
     // Hover over point
     rtdeControl->moveL(hoverPoint, _velocity);
+    pickStatus = gripper->pickup();
+
+    // If no MM in gripper abort
+    if (!pickStatus) {
+        rtdeControl->moveL(basePos);
+        return false;
+    }
 
     // Go to drop_point
     rtdeControl->moveL(dropPoints[color]);
@@ -234,6 +242,7 @@ void RobotArm::pickUp(string color, vector<double> point) {
     // Go to base position
     rtdeControl->moveL(basePos);
 
+    return true;
 }
 
 // Getters
