@@ -69,17 +69,20 @@ int main(int argc, char *argv[])
     MainWindow gui;
     gui.show();
 
+
+
     // Launch robot logic in separate thread
-    std::thread robotThread(runRobotLogic);
+    //thread robotThread(robotLogic);
 
     // Start GUI loop
     int result = app.exec();
 
+    /*
     // Join the robot thread before exiting
     if (robotThread.joinable())
     {
         robotThread.join();
     }
-    
+    */
     return result;
 }

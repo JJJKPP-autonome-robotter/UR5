@@ -7,8 +7,9 @@
 #include <QLabel>
 #include <array>
 
-class MainWindow : public QWidget
-{
+#include "Data_saver.hpp" // Ensure this defines the data_saver class
+
+class MainWindow : public QWidget {
     Q_OBJECT
 
 public:
@@ -19,11 +20,13 @@ private:
     QVBoxLayout *layout;                 // Layout for toggle buttons
     std::array<QString, 6> colorNames = {"red", "orange", "yellow", "green", "blue", "brown"};
     QLabel *imageLabel;                  // Label to display the image
+    ConfigFile config;
 
     void setupUI();
     void toggleColor(int index);
 
-public slots:
+private slots:
+    void saveConfig();   // Declare saveConfig
     void refreshImage(); // Slot to refresh the image
 };
 
