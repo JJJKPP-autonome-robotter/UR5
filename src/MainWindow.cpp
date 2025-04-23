@@ -5,7 +5,8 @@
 #include <QFile>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QWidget(parent)
+    : QWidget(parent),
+      config("../config.yaml")
 {
     setWindowTitle("Toggle Switches");
     resize(1280, 720);
@@ -43,6 +44,9 @@ void MainWindow::setupUI()
         )");
         leftLayout->addWidget(btn);
         toggles[i] = btn;
+
+        // Connect the toggled signal to saveConfig
+        connect(btn, &QPushButton::toggled, this, &MainWindow::saveConfig);
     }
 
     // Right section: Image display
@@ -58,6 +62,21 @@ void MainWindow::setupUI()
     mainLayout->addWidget(imageLabel, 2); // Right section takes 2/3 of the width
 
     setLayout(mainLayout); // Set the main layout
+}
+
+// saves the current state of the toggles to the config file
+void MainWindow::saveConfig() {
+    std::vector<std::string> selectedColors;
+
+    for (int i = 0; i < toggles.size(); ++i) {
+        if (toggles[i]->isChecked()) {
+            selectedColors.push_back(colorNames[i].toStdString());
+        }
+    }
+
+    // Save the selected colors as a single array entry in the config
+    config.set("cvCfg", "colorToPick", selectedColors);
+    config.save();
 }
 
 void MainWindow::refreshImage()
