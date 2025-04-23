@@ -142,6 +142,8 @@ string DataLogger::vectorToString(const vector<double>& vector) {
 void DataLogger::beginTransaction() {
     if (!db) return;
 
+    cout << "Auto-commit: " << sqlite3_get_autocommit(db) << endl;
+
     if (sqlite3_get_autocommit(db) != 0) {
         char* errMsg = nullptr;
         if (sqlite3_exec(db, "BEGIN TRANSACTION;", nullptr, nullptr, &errMsg) != SQLITE_OK) {
@@ -188,7 +190,7 @@ bool DataLogger::logEvent(
     string realCords = vectorToString(realCord);
     string picCords = vectorToString(picCord);
 
-    beginTransaction();
+    //beginTransaction();
 
     try {
         vector<unsigned char> imageBlob;
@@ -217,8 +219,25 @@ bool DataLogger::logEvent(
         string sql = "INSERT INTO pick_events (run_id, timeStamp, color, realPos, picPos, image, mask) "
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
+        cout << "SQL: " << sql << endl;
+        cout << "DB is " << (db ? "valid" : "null") << endl;
+
+        if (!db) {
+            cerr << "DB is null before preparing insert." << endl;
+            return false;
+        }
+
+        cout << "sqlite3_db_filename: " << sqlite3_db_filename(db, "main") << endl;
+
         sqlite3_stmt* stmt = nullptr;
-        int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr);
+        cout << "Testing DB pointer: " << db << endl;
+        cout << "DB filename: " << sqlite3_db_filename(db, "main") << endl;
+        cout << "DB status: " << sqlite3_errmsg(db) << endl;
+
+        int rc = sqlite3_prepare_v2(db, sql.c_str(), static_cast<int>(sql.length()), &stmt, nullptr);
+        if (rc != SQLITE_OK) {
+            cerr << "PREPARE FAILED (" << rc << "): " << sqlite3_errmsg(db) << endl;
+        }
 
         if (rc != SQLITE_OK) {
             cerr << "Failed to prepare statement (" << rc << "): " << sqlite3_errmsg(db) << endl;
@@ -255,7 +274,7 @@ bool DataLogger::logEvent(
 
         sqlite3_finalize(stmt);
 
-        commitTransaction();
+        //commitTransaction();
 
         cout << "Successfully logged pick event with ID: " << sqlite3_last_insert_rowid(db) << endl;
         return true;

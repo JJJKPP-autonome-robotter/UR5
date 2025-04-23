@@ -46,9 +46,10 @@ void mainLoop(bool dbActive, DataLogger& db) {
 int main() {
     initializeRobot();
     calibrateSystem();
+
     bool dbActive = cfg.get<bool>("dataLogger","active");
-    DataLogger db;
-    if (dbActive) db = initDataLogger();
+    DataLogger db = dbActive ? initDataLogger() : DataLogger();
+    
     mainLoop(dbActive, db);
     return 0;
 }

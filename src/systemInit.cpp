@@ -46,7 +46,7 @@ void calibrateSystem() {
 
     camera.captureAndSave(imagePath);
 
-    pixelToRobot = new PixelToRobot(imagePath);
+    pixelToRobot = new PixelToRobot("input.jpg");
     pixelToRobot->calibrate(&cfg);
 
     if (DEBUG) {
