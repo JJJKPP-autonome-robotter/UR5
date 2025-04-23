@@ -28,11 +28,11 @@ void mainLoop(bool dbActive, DataLogger& db) {
              << "Robot (" << robotCoord.x << ", " << robotCoord.y << ")" << endl;
 
         vector<double> mm = {robotCoord.x, robotCoord.y};
-        ur5->pickUp(color, mm);
+        bool pickup = false;
+        pickup = ur5->pickUp(color, mm);
 
         if (dbActive) {
             string& dbColor = color;
-            bool pickup = ur5->getPickStatus();
             vector<double>& dbRealCoord = mm;
             vector<double> dbPicCoord = {static_cast<double>(mmCenter.x), static_cast<double>(mmCenter.y)};
             string image = cfg.get<string>("cvCfg","imagePath");
