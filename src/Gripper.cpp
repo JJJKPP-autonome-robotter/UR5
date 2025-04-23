@@ -53,6 +53,22 @@ bool Gripper::close() {
     return closed;
 }
 
+bool Gripper::pickup() {
+    string message = "d";
+    send(message); // Sends distance message to gripper
+
+    string inputMessage;
+    while (true) {
+        inputMessage = read(); // Reads from pico
+
+        if (inputMessage == "error") return false;
+        if (inputMessage == "good") return true;
+        if (inputMessage == "bad") return false;
+    }
+
+    return false;
+}
+
 // Send message to gripper
 void Gripper::send(const string& message) {
     write(port, buffer(message)); // Write message to gripper

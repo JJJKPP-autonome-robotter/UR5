@@ -48,6 +48,8 @@ bool DataLogger::createTables() {
             color TEXT,
             realPos TEXT,
             picPos TEXT,
+            hsvLower TEXT,
+            hsvUpper TEXT,
             image BLOB,
             mask BLOB,
             FOREIGN KEY(run_id) REFERENCES runs(id)
@@ -169,9 +171,11 @@ void DataLogger::commitTransaction() {
 bool DataLogger::logEvent(
     const string& color, 
     const vector<double>& realCord, 
-    const vector<double>& picCord, 
+    const vector<double>& picCord,
+    const vector<double>& HL,
+    const vector<double>& HU,
     const string& image,
-    const cv::Mat& mask 
+    const cv::Mat& mask
 ) {
     if (!db) {
         cerr << "Database connection is null" << endl;
@@ -190,7 +194,8 @@ bool DataLogger::logEvent(
     string realCords = vectorToString(realCord);
     string picCords = vectorToString(picCord);
 
-    //beginTransaction();
+    string hsvLower = vectorToString(HL);
+    string hsvUpper = vectorToString(HU);
 
     try {
         vector<unsigned char> imageBlob;
@@ -213,11 +218,13 @@ bool DataLogger::logEvent(
         cout << "- Color: " << color << endl;
         cout << "- Real Coordinates: " << realCords << endl;
         cout << "- Pic Coordinates: " << picCords << endl;
+        cout << "- HSV Lower: " << hsvLower << endl;
+        cout << "- HSV Upper: " << hsvUpper << endl;
         cout << "- Image Size: " << imageBlob.size() << " bytes" << endl;
         cout << "- Mask Size: " << maskBlob.size() << " bytes" << endl;
 
-        string sql = "INSERT INTO pick_events (run_id, timeStamp, color, realPos, picPos, image, mask) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        string sql = "INSERT INTO pick_events (run_id, timeStamp, color, realPos, picPos, hsvLower, hsvUpper, image, mask) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         cout << "SQL: " << sql << endl;
         cout << "DB is " << (db ? "valid" : "null") << endl;
@@ -250,16 +257,18 @@ bool DataLogger::logEvent(
         if (sqlite3_bind_text(stmt, 3, color.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind color: " << sqlite3_errmsg(db) << endl;
         if (sqlite3_bind_text(stmt, 4, realCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind realPos: " << sqlite3_errmsg(db) << endl;
         if (sqlite3_bind_text(stmt, 5, picCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind picPos: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 6, hsvLower.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind hsvLower: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 7, hsvUpper.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind hsvUpper: " << sqlite3_errmsg(db) << endl;
         if (imageBlob.empty()) {
-            if (sqlite3_bind_null(stmt, 6) != SQLITE_OK) cerr << "Failed to bind null image: " << sqlite3_errmsg(db) << endl;
+            if (sqlite3_bind_null(stmt, 8) != SQLITE_OK) cerr << "Failed to bind null image: " << sqlite3_errmsg(db) << endl;
         } else {
-            if (sqlite3_bind_blob(stmt, 6, imageBlob.data(), imageBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
+            if (sqlite3_bind_blob(stmt, 8, imageBlob.data(), imageBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
                 cerr << "Failed to bind image: " << sqlite3_errmsg(db) << endl;
         }
         if (maskBlob.empty()) {
-            if (sqlite3_bind_null(stmt, 7) != SQLITE_OK) cerr << "Failed to bind null mask: " << sqlite3_errmsg(db) << endl;
+            if (sqlite3_bind_null(stmt, 9) != SQLITE_OK) cerr << "Failed to bind null mask: " << sqlite3_errmsg(db) << endl;
         } else {
-            if (sqlite3_bind_blob(stmt, 7, maskBlob.data(), maskBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
+            if (sqlite3_bind_blob(stmt, 9, maskBlob.data(), maskBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
                 cerr << "Failed to bind mask: " << sqlite3_errmsg(db) << endl;
         }
 
@@ -273,8 +282,6 @@ bool DataLogger::logEvent(
         }
 
         sqlite3_finalize(stmt);
-
-        //commitTransaction();
 
         cout << "Successfully logged pick event with ID: " << sqlite3_last_insert_rowid(db) << endl;
         return true;
