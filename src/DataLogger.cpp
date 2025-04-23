@@ -46,6 +46,7 @@ bool DataLogger::createTables() {
             run_id INTEGER NOT NULL,
             timeStamp TEXT NOT NULL,
             color TEXT,
+            pickup BOOLEAN,
             realPos TEXT,
             picPos TEXT,
             hsvLower TEXT,
@@ -169,7 +170,8 @@ void DataLogger::commitTransaction() {
 }
 
 bool DataLogger::logEvent(
-    const string& color, 
+    const string& color,
+    const bool& pickup, 
     const vector<double>& realCord, 
     const vector<double>& picCord,
     const vector<double>& HL,
@@ -216,6 +218,7 @@ bool DataLogger::logEvent(
         cout << "Preparing to insert event:" << endl;
         cout << "- Run ID: " << runId << endl;
         cout << "- Color: " << color << endl;
+        cout << "- Pickup: " << pickup << endl;
         cout << "- Real Coordinates: " << realCords << endl;
         cout << "- Pic Coordinates: " << picCords << endl;
         cout << "- HSV Lower: " << hsvLower << endl;
@@ -223,8 +226,8 @@ bool DataLogger::logEvent(
         cout << "- Image Size: " << imageBlob.size() << " bytes" << endl;
         cout << "- Mask Size: " << maskBlob.size() << " bytes" << endl;
 
-        string sql = "INSERT INTO pick_events (run_id, timeStamp, color, realPos, picPos, hsvLower, hsvUpper, image, mask) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        string sql = "INSERT INTO pick_events (run_id, timeStamp, color, pickup, realPos, picPos, hsvLower, hsvUpper, image, mask) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         cout << "SQL: " << sql << endl;
         cout << "DB is " << (db ? "valid" : "null") << endl;
@@ -255,20 +258,21 @@ bool DataLogger::logEvent(
         if (sqlite3_bind_int(stmt, 1, runId) != SQLITE_OK) cerr << "Failed to bind run_id: " << sqlite3_errmsg(db) << endl;
         if (sqlite3_bind_text(stmt, 2, timeStamp, -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind timeStamp: " << sqlite3_errmsg(db) << endl;
         if (sqlite3_bind_text(stmt, 3, color.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind color: " << sqlite3_errmsg(db) << endl;
-        if (sqlite3_bind_text(stmt, 4, realCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind realPos: " << sqlite3_errmsg(db) << endl;
-        if (sqlite3_bind_text(stmt, 5, picCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind picPos: " << sqlite3_errmsg(db) << endl;
-        if (sqlite3_bind_text(stmt, 6, hsvLower.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind hsvLower: " << sqlite3_errmsg(db) << endl;
-        if (sqlite3_bind_text(stmt, 7, hsvUpper.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind hsvUpper: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_int(stmt, 4, pickup) != SQLITE_OK) cerr << "Failed to bind pickup: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 5, realCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind realPos: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 6, picCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind picPos: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 7, hsvLower.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind hsvLower: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 8, hsvUpper.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind hsvUpper: " << sqlite3_errmsg(db) << endl;
         if (imageBlob.empty()) {
-            if (sqlite3_bind_null(stmt, 8) != SQLITE_OK) cerr << "Failed to bind null image: " << sqlite3_errmsg(db) << endl;
+            if (sqlite3_bind_null(stmt, 9) != SQLITE_OK) cerr << "Failed to bind null image: " << sqlite3_errmsg(db) << endl;
         } else {
-            if (sqlite3_bind_blob(stmt, 8, imageBlob.data(), imageBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
+            if (sqlite3_bind_blob(stmt, 9, imageBlob.data(), imageBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
                 cerr << "Failed to bind image: " << sqlite3_errmsg(db) << endl;
         }
         if (maskBlob.empty()) {
-            if (sqlite3_bind_null(stmt, 9) != SQLITE_OK) cerr << "Failed to bind null mask: " << sqlite3_errmsg(db) << endl;
+            if (sqlite3_bind_null(stmt, 10) != SQLITE_OK) cerr << "Failed to bind null mask: " << sqlite3_errmsg(db) << endl;
         } else {
-            if (sqlite3_bind_blob(stmt, 9, maskBlob.data(), maskBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
+            if (sqlite3_bind_blob(stmt, 10, maskBlob.data(), maskBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
                 cerr << "Failed to bind mask: " << sqlite3_errmsg(db) << endl;
         }
 

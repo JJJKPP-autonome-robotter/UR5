@@ -32,6 +32,7 @@ void mainLoop(bool dbActive, DataLogger& db) {
 
         if (dbActive) {
             string& dbColor = color;
+            bool pickup = ur5->getPickStatus();
             vector<double>& dbRealCoord = mm;
             vector<double> dbPicCoord = {static_cast<double>(mmCenter.x), static_cast<double>(mmCenter.y)};
             string image = cfg.get<string>("cvCfg","imagePath");
@@ -54,7 +55,7 @@ void mainLoop(bool dbActive, DataLogger& db) {
                 hsvUpper.insert(hsv.end(), range[1].begin(), range[1].end());
             }
 
-            db.logEvent(dbColor, dbRealCoord, dbPicCoord, hsvLower, hsvUpper, image, mask);
+            db.logEvent(dbColor, pickup, dbRealCoord, dbPicCoord, hsvLower, hsvUpper, image, mask);
             cout << "Saved data" << endl;
         }
     }
