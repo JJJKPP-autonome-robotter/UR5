@@ -9,6 +9,7 @@ Gripper *gripper;
 CaptureImage camera(cfg.get<int>("cvCfg", "cameraPort"));
 PixelToRobot *pixelToRobot;
 unordered_map<string, vector<double>> dropPoints;
+ProcessImage processor(cfg.get<string>("cvCfg", "imagePath"));
 
 // debug
 bool DEBUG = cfg.get<bool>("cvCfg", "debug");
@@ -42,6 +43,9 @@ void initializeRobot() {
 void calibrateSystem() {
     // Initialize PixelToRobot
     string imagePath = cfg.get<string>("cvCfg", "imagePath");
+
+    camera.captureAndSave(imagePath);
+
     pixelToRobot = new PixelToRobot(imagePath);
     pixelToRobot->calibrate(&cfg);
 
@@ -91,17 +95,14 @@ void calibrateSystem() {
 
 pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
     // Capture and save image
-    if (camera.captureAndSave("input.jpg")) {
+    string imagePath = cfg.get<string>("cvCfg","imagePath");
+    if (camera.captureAndSave(imagePath)) {
         cout << "Image successfully captured and saved!" << endl;
     } else {
         cerr << "Failed to capture image." << endl;
         return {Point(0, 0), ""};  // Indicate failure
     }
 
-    // Process image
-    string imagePath = cfg.get<string>("cvCfg", "imagePath");
-
-    ProcessImage processor(imagePath);
     processor.setHsvRange(&cfg);
 
     pair<Point, string>

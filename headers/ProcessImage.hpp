@@ -21,6 +21,8 @@ public:
     pair<Point, string> detectAll(const vector<string> &selectedColors);  // Updated to return Point and color as a pair
     void setHsvRange(ConfigFile* cfg);
 
+    Mat getMask();
+
    private:
     void preprocess(string color);
     void detectContours(const string& color);  // Updated to accept color as a parameter

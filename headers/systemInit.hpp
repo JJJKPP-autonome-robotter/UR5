@@ -22,6 +22,7 @@ extern Gripper *gripper;
 extern CaptureImage camera;
 extern PixelToRobot *pixelToRobot;
 extern unordered_map<string, vector<double>> dropPoints;
+extern ProcessImage processor;
 
 void initializeRobot();
 void calibrateSystem();
