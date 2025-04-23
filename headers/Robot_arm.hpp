@@ -26,7 +26,7 @@ public:
     void connect();// Connects to Robot arm
     void validateRefPoints(); // Validate refpoints
     void validateDropPoints(); // Validate drop points
-    void pickUp(string, vector<double>); // Pick up color from point vector<double> {x, y}
+    bool pickUp(string, vector<double>); // Pick up color from point vector<double> {x, y}
 
     // Getters
     double getVelocity(); // Velocity double
@@ -58,6 +58,7 @@ private:
 
     // Gripper
     Gripper* gripper;
+    bool pickStatus;
 
     // Movement variables
     double velocity;
