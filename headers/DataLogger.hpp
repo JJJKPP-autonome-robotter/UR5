@@ -27,6 +27,8 @@ public:
         const string& color, 
         const vector<double>& realCord, 
         const vector<double>& picCord,
+        const vector<double>& HL,
+        const vector<double>& HU,
         const string& imagePath,
         const cv::Mat& mask
     );
