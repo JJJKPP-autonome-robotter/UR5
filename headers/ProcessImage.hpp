@@ -26,6 +26,7 @@ public:
    private:
     void preprocess(string color);
     void detectContours(const string& color);  // Updated to accept color as a parameter
+    void getImage(const string& imagePath);
 
     Mat image;
     Mat hsv;

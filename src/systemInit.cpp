@@ -105,8 +105,7 @@ pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
 
     processor.setHsvRange(&cfg);
 
-    pair<Point, string>
-    toPick = processor.detectAll(selectedColors);
+    pair<Point, string>  toPick = processor.detectAll(selectedColors);
     vector<pair<Point, string>> centers = processor.getCenters();
 
 

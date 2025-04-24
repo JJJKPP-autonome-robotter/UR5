@@ -11,6 +11,15 @@ ProcessImage::ProcessImage(const string& imagePath) {
     output = image.clone(); 
 }
 
+void ProcessImage::getImage(const string& imagePath) {
+    image = imread(imagePath);
+    if (image.empty()) {
+        cerr << "Error: Could not open or find the image!" << endl;
+        exit(1);
+    }
+    output = image.clone();
+}
+
 void ProcessImage::setHsvRange(ConfigFile* cfg) {
     vector<vector<int>> allColorRanges;
 
@@ -137,7 +146,9 @@ void ProcessImage::detectContours(const string& color) {
 // detect specific color
 // stored in centers
 void ProcessImage::detectMMS(string color) {
-    centers.clear(); // clear previous centers
+    getImage("input.jpg"); // Load the image
+
+    centers.clear();  // clear previous centers
     preprocess(color);
     detectContours(color);
 }
