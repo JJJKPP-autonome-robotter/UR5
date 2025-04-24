@@ -75,8 +75,8 @@ gripperCfg:
   tcpOffset: [0, 0, 0.216, 0, 0, 0]
   payload: 0.5
 cvCfg:
-  imagePath: /home/kris/Documents/SDU/2._Sem_Proj/UR5/img/input41.jpg
-  cameraPort: 0
+  imagePath: input.jpg
+  cameraPort: 4
   debug: true
   colorToPick: [red, orange]
 color_ranges:
