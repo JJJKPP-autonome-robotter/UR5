@@ -7,7 +7,7 @@ Gripper::~Gripper() {
 
 // Constructor
 Gripper::Gripper(uint32_t _baudrate, vector<double> _offset, double _payload) : port(io) {
-    portName = findPort(); // Get device addres
+    portName = "/dev/ttyACM0"; //findPort(); // Get device addres
     baudrate = _baudrate;
     offset = _offset;
     payload = _payload;

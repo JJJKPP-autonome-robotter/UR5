@@ -43,10 +43,10 @@ void initializeRobot() {
 void calibrateSystem() {
     // Initialize PixelToRobot
     string imagePath = cfg.get<string>("cvCfg", "imagePath");
-
+    
     camera.captureAndSave(imagePath);
 
-    pixelToRobot = new PixelToRobot("input.jpg");
+    pixelToRobot = new PixelToRobot(imagePath);
     pixelToRobot->calibrate(&cfg);
 
     if (DEBUG) {
@@ -96,7 +96,7 @@ void calibrateSystem() {
 pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
     // Capture and save image
     string imagePath = cfg.get<string>("cvCfg","imagePath");
-    if (camera.captureAndSave(imagePath)) {
+    if (camera.captureAndSave("input.jpg")) {
         cout << "Image successfully captured and saved!" << endl;
     } else {
         cerr << "Failed to capture image." << endl;
