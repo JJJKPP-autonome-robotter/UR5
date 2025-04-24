@@ -4,6 +4,7 @@
 // load image =D
 ProcessImage::ProcessImage(const string& imagePath) { 
     image = imread(imagePath);
+    
     if (image.empty()) {
         cerr << "Error: Could not open or find the image!" << endl;
         exit(1);
@@ -13,10 +14,12 @@ ProcessImage::ProcessImage(const string& imagePath) {
 
 void ProcessImage::getImage(const string& imagePath) {
     image = imread(imagePath);
+
     if (image.empty()) {
         cerr << "Error: Could not open or find the image!" << endl;
         exit(1);
     }
+
     output = image.clone();
 }
 
@@ -155,6 +158,8 @@ void ProcessImage::detectMMS(string color) {
 
 // detectAll to return the point with the color
 pair<Point, string> ProcessImage::detectAll(const vector<string>& selectedColors) {
+    getImage("input.jpg"); // Load the image
+
     centers.clear(); // clear previous points
 
     for (const auto &color : selectedColors) {

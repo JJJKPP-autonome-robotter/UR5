@@ -102,5 +102,5 @@ color_ranges:
     - [8, 150, 40]
     - [14, 255, 120]
 dataLogger:
-  active: false
+  active: true
   dbFileName: ../data_log.db

@@ -204,7 +204,7 @@ bool RobotArm::confirmPoint(vector<double>& refPoint) {
 bool RobotArm::pickUp(string color, vector<double> point) {
     double _velocity = 0.1; // Pick up velocity
 
-    point.insert(point.end(), {-0.02, 3.14, 0, 0}); // Add table height and tool rotation
+    point.insert(point.end(), {-0.0225, 3.14, 0, 0}); // Add table height and tool rotation
 
     // Make hover point, to avoid collision
     vector<double> hoverPoint = point;

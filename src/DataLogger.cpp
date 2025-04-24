@@ -172,13 +172,14 @@ void DataLogger::commitTransaction() {
 bool DataLogger::logEvent(
     const string& color,
     const bool& pickup, 
-    const vector<double>& realCord, 
-    const vector<double>& picCord,
-    const vector<double>& HL,
-    const vector<double>& HU,
+    const vector<double> realCord, 
+    const vector<double> picCord,
+    const vector<double> HL,
+    const vector<double> HU,
     const string& image,
     const cv::Mat& mask
 ) {
+
     if (!db) {
         cerr << "Database connection is null" << endl;
         return false;

@@ -42,17 +42,22 @@ void mainLoop(bool dbActive, DataLogger& db) {
             vector<double> hsvLower;
 
             if (color == "red") {
+                cout << "REDSAVE" << endl;
                 vector<vector<double>> range1 = cfg.get<vector<vector<double>>>("color_ranges","red");
                 vector<vector<double>> range2 = cfg.get<vector<vector<double>>>("color_ranges","red2");
                 hsvLower.insert(hsvLower.end(), range1[0].begin(), range1[0].end());
                 hsvLower.insert(hsvLower.end(), range2[0].begin(), range2[0].end());
                 hsvUpper.insert(hsvUpper.end(), range1[1].begin(), range1[1].end());
-                hsvLower.insert(hsvUpper.end(), range2[1].begin(), range2[1].end());
+                hsvUpper.insert(hsvUpper.end(), range2[1].begin(), range2[1].end());
+
+                cout << "REDSAVEDONE" << endl;
 
             } else {
+                cout << "OTHER COLOR SAVE" << endl;
                 vector<vector<double>> range = cfg.get<vector<vector<double>>>("color_ranges", color);
                 hsvLower.insert(hsvLower.end(), range[0].begin(), range[0].end());
                 hsvUpper.insert(hsvUpper.end(), range[1].begin(), range[1].end());
+                cout << "OTHER COLOR DONE" << endl; 
             }
 
             db.logEvent(dbColor, pickup, dbRealCoord, dbPicCoord, hsvLower, hsvUpper, image, mask);
