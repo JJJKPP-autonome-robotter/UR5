@@ -154,8 +154,8 @@ string DataLogger::vectorToString(const vector<double>& vector) {
 void DataLogger::setHsvRange() {
     if (color == "red") {
         cout << "REDSAVE" << endl;
-        vector<vector<double>> range1 = cfg.get<vector<vector<double>>>("color_ranges","red");
-        vector<vector<double>> range2 = cfg.get<vector<vector<double>>>("color_ranges","red2");
+        vector<vector<double>> range1 = cfg->get<vector<vector<double>>>("color_ranges","red");
+        vector<vector<double>> range2 = cfg->get<vector<vector<double>>>("color_ranges","red2");
         hsvLower.insert(hsvLower.end(), range1[0].begin(), range1[0].end());
         hsvLower.insert(hsvLower.end(), range2[0].begin(), range2[0].end());
         hsvUpper.insert(hsvUpper.end(), range1[1].begin(), range1[1].end());
@@ -166,7 +166,7 @@ void DataLogger::setHsvRange() {
     }
 
     cout << "OTHER COLOR SAVE" << endl;
-    vector<vector<double>> range = cfg.get<vector<vector<double>>>("color_ranges", color);
+    vector<vector<double>> range = cfg->get<vector<vector<double>>>("color_ranges", color);
     hsvLower.insert(hsvLower.end(), range[0].begin(), range[0].end());
     hsvUpper.insert(hsvUpper.end(), range[1].begin(), range[1].end());
     cout << "OTHER COLOR DONE" << endl;
@@ -203,16 +203,7 @@ void DataLogger::commitTransaction() {
 
 }
 
-bool DataLogger::writeEvent(
-    const string& color,
-    const bool& pickup, 
-    const vector<double> realCord, 
-    const vector<double> picCord,
-    const vector<double> HL,
-    const vector<double> HU,
-    const string& image,
-    const cv::Mat& mask
-) {
+bool DataLogger::writeEvent() {
 
     if (!db) {
         cerr << "Database connection is null" << endl;
@@ -313,23 +304,21 @@ bool DataLogger::writeEvent(
 bool DataLogger::logEvent(
     const string _color,
     const bool _pickup, 
-    const vector<double> _realCord, 
-    const Point _picCord,
-    const string _image,
+    const vector<double> _realCords, 
+    cv::Point _picCords,
     const cv::Mat _mask
 ) {
     color = _color;
     pickup = _pickup;
-    realCord = vectorToString(_realCord);
-    picCord = vectorToString{static_cast<double>(mmCenter.x), static_cast<double>(mmCenter.y)};
-    mask = _mask;
+    realCords = vectorToString(_realCords);
+    picCords = vectorToString({static_cast<double>(_picCords.x), static_cast<double>(_picCords.y)});
 
     setHsvRange();
 
     string imagePath = cfg->get<string>("cvCfg","imagePath");
     imageBlob = encodeImage(imagePath);
-    maskBlob = encodeMask(mask);
+    maskBlob = encodeMask(_mask);
 
-    db.writeEvent();
+    writeEvent();
     cout << "Saved data" << endl;
 }

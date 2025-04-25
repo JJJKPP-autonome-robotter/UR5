@@ -24,7 +24,7 @@ public:
     void beginTransaction();
     void commitTransaction();
 
-    bool logEvent(const string, const bool _pickup, const vector<double>, const Point, const cv::Mat);
+    bool logEvent(const string, const bool _pickup, const vector<double>, cv::Point, const cv::Mat);
     bool writeEvent();
 
 private:
@@ -40,12 +40,12 @@ private:
     vector<unsigned char> encodeMask(const cv::Mat& mask);
     void setHsvRange();
 
-    const string color;
-    const bool pickup;
-    const string realCord;
-    const string picCord;
-    const string hsvLower;
-    const string hsvUpper;
+    string color;
+    bool pickup;
+    string realCords;
+    string picCords;
+    string hsvLower;
+    string hsvUpper;
     vector<unsigned char> imageBlob;
     vector<unsigned char> maskBlob;
 

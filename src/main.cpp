@@ -33,7 +33,7 @@ void mainLoop(bool dbActive, DataLogger& db) {
 
         if (dbActive) {
             cv::Mat mask = processor.getMask();
-            db.logEvent(color, pickup, mm, mmCenter, mask)
+            db.logEvent(color, pickup, mm, mmCenter, mask);
         }
     }
 }
@@ -43,7 +43,7 @@ int main() {
     calibrateSystem();
 
     bool dbActive = cfg.get<bool>("dataLogger","active");
-    DataLogger db = dbActive ? DataLogger(cfg) : DataLogger();
+    DataLogger db = dbActive ? DataLogger(&cfg) : DataLogger();
     
     mainLoop(dbActive, db);
     return 0;
