@@ -15,18 +15,20 @@ class ConfigFile;
 class ProcessImage {
 public:
     ProcessImage(const string& imagePath);
-    void detectMMS(string color);
+    void detectMMS(const string& color, const vector<Point2f>& robotCenters);  // Updated to match implementation
     void showResults();
     vector<pair<Point, string>> getCenters() const;  // Updated to return Point and color
-    pair<Point, string> detectAll(const vector<string> &selectedColors);  // Updated to return Point and color as a pair
+    pair<Point, string> detectAll(const vector<string>& selectedColors, const vector<Point2f>& robotCenters);  // Updated to include robotCenters
     void setHsvRange(ConfigFile* cfg);
 
     Mat getMask();
 
-   private:
+private:
     void preprocess(string color);
-    void detectContours(const string& color);  // Updated to accept color as a parameter
-    void getImage(const string& imagePath);
+    void detectContours(const string& color, const vector<Point2f>& robotCenters);  // Updated to include robotCenters
+    void getImage();
+
+    string imagePath;
 
     Mat image;
     Mat hsv;
