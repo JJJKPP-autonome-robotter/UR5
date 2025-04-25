@@ -95,8 +95,8 @@ void calibrateSystem() {
 
 pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
     // Capture and save image
-    string imagePath = cfg.get<string>("cvCfg","imagePath");
-    if (camera.captureAndSave("input.jpg")) {
+    string imagePath = cfg.get<string>("cvCfg", "imagePath");
+    if (camera.captureAndSave(imagePath)) {
         cout << "Image successfully captured and saved!" << endl;
     } else {
         cerr << "Failed to capture image." << endl;
@@ -105,11 +105,13 @@ pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
 
     processor.setHsvRange(&cfg);
 
-    pair<Point, string>  toPick = processor.detectAll(selectedColors);
+    cout << pixelToRobot->centers.size() << endl;
+
+    // find all centers
+    pair<Point, string> toPick = processor.detectAll(selectedColors, pixelToRobot->centers);
     vector<pair<Point, string>> centers = processor.getCenters();
 
-
-    if (DEBUG){
+    if (DEBUG) {
         cout << "Number of detected centers: " << centers.size() << endl;
         for (const auto &center : centers) {
             cout << "Color: " << center.second
@@ -118,7 +120,7 @@ pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
 
         processor.showResults();  // Debug
     }
- 
+
     return toPick; // return point and color
 }
 

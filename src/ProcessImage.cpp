@@ -2,7 +2,9 @@
 #include "../headers/Data_saver.hpp" 
 
 // load image =D
-ProcessImage::ProcessImage(const string& imagePath) { 
+ProcessImage::ProcessImage(const string& path) { 
+    imagePath = path;
+
     image = imread(imagePath);
     
     if (image.empty()) {
@@ -12,7 +14,7 @@ ProcessImage::ProcessImage(const string& imagePath) {
     output = image.clone(); 
 }
 
-void ProcessImage::getImage(const string& imagePath) {
+void ProcessImage::getImage() {
     image = imread(imagePath);
 
     if (image.empty()) {
@@ -103,14 +105,17 @@ void ProcessImage::preprocess(string color) {
 // vector of points with color
 vector<pair<Point, string>> centers;
 
-
-void ProcessImage::detectContours(const string& color) {
+void ProcessImage::detectContours(const string& color, const vector<Point2f>& robotCenters) {
     vector<vector<Point>> contours;
     findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
+    // magic numbers need to be changed
     const double minArea = 1000.0;
     const double maxArea = 4000.0;
     const double maxAspectRatio = 1.40;
+
+    // Create a bounding rectangle from the robot centers
+    Rect robotBoundingBox = boundingRect(robotCenters);
 
     for (const auto& contour : contours) {
         double area = contourArea(contour);
@@ -122,21 +127,32 @@ void ProcessImage::detectContours(const string& color) {
         double aspectRatio = static_cast<double>(max(boundingBox.width, boundingBox.height)) /
                              static_cast<double>(min(boundingBox.width, boundingBox.height));
 
+        Point center;
         if (aspectRatio > maxAspectRatio) {
             if (boundingBox.width > boundingBox.height) {
                 Point center1(boundingBox.x + boundingBox.width / 4, boundingBox.y + boundingBox.height / 2);
                 Point center2(boundingBox.x + 3 * boundingBox.width / 4, boundingBox.y + boundingBox.height / 2);
-                centers.emplace_back(center1, color);
-                centers.emplace_back(center2, color);
+                if (robotBoundingBox.contains(center1)) {
+                    centers.emplace_back(center1, color);
+                }
+                if (robotBoundingBox.contains(center2)) {
+                    centers.emplace_back(center2, color);
+                }
             } else {
                 Point center1(boundingBox.x + boundingBox.width / 2, boundingBox.y + boundingBox.height / 4);
                 Point center2(boundingBox.x + boundingBox.width / 2, boundingBox.y + 3 * boundingBox.height / 4);
-                centers.emplace_back(center1, color);
-                centers.emplace_back(center2, color);
+                if (robotBoundingBox.contains(center1)) {
+                    centers.emplace_back(center1, color);
+                }
+                if (robotBoundingBox.contains(center2)) {
+                    centers.emplace_back(center2, color);
+                }
             }
         } else {
-            Point center(boundingBox.x + boundingBox.width / 2, boundingBox.y + boundingBox.height / 2);
-            centers.emplace_back(center, color);
+            center = Point(boundingBox.x + boundingBox.width / 2, boundingBox.y + boundingBox.height / 2);
+            if (robotBoundingBox.contains(center)) {
+                centers.emplace_back(center, color);
+            }
         }
     }
 
@@ -145,26 +161,25 @@ void ProcessImage::detectContours(const string& color) {
     }
 }
 
-
 // detect specific color
 // stored in centers
-void ProcessImage::detectMMS(string color) {
-    getImage("input.jpg"); // Load the image
+void ProcessImage::detectMMS(const string& color, const vector<Point2f>& robotCenters) {
+    getImage(); // Load the image
 
     centers.clear();  // clear previous centers
     preprocess(color);
-    detectContours(color);
+    detectContours(color, robotCenters); // Pass robotCenters to detectContours
 }
 
 // detectAll to return the point with the color
-pair<Point, string> ProcessImage::detectAll(const vector<string>& selectedColors) {
-    getImage("input.jpg"); // Load the image
+pair<Point, string> ProcessImage::detectAll(const vector<string>& selectedColors, const vector<Point2f>& robotCenters) {
+    getImage(); // Load the image
 
     centers.clear(); // clear previous points
 
-    for (const auto &color : selectedColors) {
+    for (const auto& color : selectedColors) {
         preprocess(color);
-        detectContours(color); 
+        detectContours(color, robotCenters); // Pass robotCenters to detectContours
     }
 
     // sort centers by y and x coordinates
