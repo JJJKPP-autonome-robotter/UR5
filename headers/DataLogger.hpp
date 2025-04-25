@@ -11,6 +11,7 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include "../headers/Data_saver.hpp"
 
 using namespace std;
 
@@ -18,23 +19,16 @@ class DataLogger {
 public:
     DataLogger();
     ~DataLogger();
-    DataLogger(const string&);
+    DataLogger(ConfigFile*);
 
     void beginTransaction();
     void commitTransaction();
 
-    bool logEvent(
-        const string& color, 
-        const bool& pickup,
-        const vector<double> realCord, 
-        const vector<double> picCord,
-        const vector<double> HL,
-        const vector<double> HU,
-        const string& imagePath,
-        const cv::Mat& mask
-    );
+    bool logEvent(const string, const bool _pickup, const vector<double>, cv::Point, const cv::Mat);
+    bool writeEvent();
 
 private:
+    ConfigFile* cfg;
     string dbFileName;
     sqlite3* db;
     int runId;
@@ -44,6 +38,16 @@ private:
     string vectorToString(const vector<double>& vector);
     vector<unsigned char> encodeImage(const string& path);
     vector<unsigned char> encodeMask(const cv::Mat& mask);
+    void setHsvRange();
+
+    string color;
+    bool pickup;
+    string realCords;
+    string picCords;
+    string hsvLower;
+    string hsvUpper;
+    vector<unsigned char> imageBlob;
+    vector<unsigned char> maskBlob;
 
 };
 
