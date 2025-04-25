@@ -123,9 +123,3 @@ pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
 
     return toPick; // return point and color
 }
-
-DataLogger initDataLogger() {
-    string dbFile = cfg.get<string>("dataLogger","dbFileName");
-    DataLogger db = DataLogger(dbFile);
-    return db;
-}

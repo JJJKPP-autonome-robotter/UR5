@@ -11,8 +11,9 @@ DataLogger::~DataLogger() {
     }
 }
 
-DataLogger::DataLogger(const string& dbFile) {
-    dbFileName = dbFile;
+DataLogger::DataLogger(ConfigFile* _cfg) {
+    cfg = _cfg;
+    dbFileName = cfg->get<string>("dataLogger","dbFileName");
     db = nullptr;
     runId = -1;
 
@@ -109,27 +110,35 @@ bool DataLogger::startNewRun() {
 }
 
 vector<unsigned char> DataLogger::encodeImage(const string &path) {
-    cv::Mat image = cv::imread(path, cv::IMREAD_COLOR);
+    try {
+        cv::Mat image = cv::imread(path, cv::IMREAD_COLOR);
 
-    if (image.empty()) {
-        cerr << "Warning: Cannot open image: " << path << endl;
-        return vector<unsigned char>();
+        if (image.empty()) {
+            cerr << "Warning: Cannot open image: " << path << endl;
+            return vector<unsigned char>();
+        }
+
+        vector<unsigned char> buffer;
+        cv::imencode(".jpg", image, buffer);
+        return buffer;
+    } catch (const exception& e) {
+        cerr << "Error encoding image: " << e.what() << endl;
     }
-
-    vector<unsigned char> buffer;
-    cv::imencode(".jpg", image, buffer);
-    return buffer;
 }
 
 vector<unsigned char> DataLogger::encodeMask(const cv::Mat& mask) {
-    if (mask.empty()) {
-        cerr << "Warning: Empty mask provided" << endl;
-        return vector<unsigned char>();
-    }
+    try {
+        if (mask.empty()) {
+            cerr << "Warning: Empty mask provided" << endl;
+            return vector<unsigned char>();
+        }
 
-    vector<unsigned char> buffer;
-    cv::imencode(".jpg", mask, buffer);
-    return buffer;
+        vector<unsigned char> buffer;
+        cv::imencode(".jpg", mask, buffer);
+        return buffer;
+    } catch (const exception& e) {
+        cerr << "Error encoding mask: " << e.what() << endl;
+    }
 }
 
 string DataLogger::vectorToString(const vector<double>& vector) {
@@ -140,6 +149,28 @@ string DataLogger::vectorToString(const vector<double>& vector) {
     }
 
     return oss.str();
+}
+
+void DataLogger::setHsvRange() {
+    if (color == "red") {
+        cout << "REDSAVE" << endl;
+        vector<vector<double>> range1 = cfg.get<vector<vector<double>>>("color_ranges","red");
+        vector<vector<double>> range2 = cfg.get<vector<vector<double>>>("color_ranges","red2");
+        hsvLower.insert(hsvLower.end(), range1[0].begin(), range1[0].end());
+        hsvLower.insert(hsvLower.end(), range2[0].begin(), range2[0].end());
+        hsvUpper.insert(hsvUpper.end(), range1[1].begin(), range1[1].end());
+        hsvUpper.insert(hsvUpper.end(), range2[1].begin(), range2[1].end());
+
+        cout << "REDSAVEDONE" << endl;
+        return;
+    }
+
+    cout << "OTHER COLOR SAVE" << endl;
+    vector<vector<double>> range = cfg.get<vector<vector<double>>>("color_ranges", color);
+    hsvLower.insert(hsvLower.end(), range[0].begin(), range[0].end());
+    hsvUpper.insert(hsvUpper.end(), range[1].begin(), range[1].end());
+    cout << "OTHER COLOR DONE" << endl;
+
 }
 
 void DataLogger::beginTransaction() {
@@ -153,6 +184,7 @@ void DataLogger::beginTransaction() {
             cerr << "Failed to begin transaction: " << errMsg << endl;
             sqlite3_free(errMsg);
         }
+
     }
     
 }
@@ -166,10 +198,12 @@ void DataLogger::commitTransaction() {
             cerr << "Failed to commit transaction: " << errMsg << endl;
             sqlite3_free(errMsg);
         }
+
     }
+
 }
 
-bool DataLogger::logEvent(
+bool DataLogger::writeEvent(
     const string& color,
     const bool& pickup, 
     const vector<double> realCord, 
@@ -194,39 +228,18 @@ bool DataLogger::logEvent(
     char timeStamp[100];
     strftime(timeStamp, sizeof(timeStamp), "%Y-%m-%d %H:%M:%S", localtime(&now));
 
-    string realCords = vectorToString(realCord);
-    string picCords = vectorToString(picCord);
-
-    string hsvLower = vectorToString(HL);
-    string hsvUpper = vectorToString(HU);
+    cout << "Preparing to insert event:" << endl;
+    cout << "- Run ID: " << runId << endl;
+    cout << "- Color: " << color << endl;
+    cout << "- Pickup: " << pickup << endl;
+    cout << "- Real Coordinates: " << realCords << endl;
+    cout << "- Pic Coordinates: " << picCords << endl;
+    cout << "- HSV Lower: " << hsvLower << endl;
+    cout << "- HSV Upper: " << hsvUpper << endl;
+    cout << "- Image Size: " << imageBlob.size() << " bytes" << endl;
+    cout << "- Mask Size: " << maskBlob.size() << " bytes" << endl;
 
     try {
-        vector<unsigned char> imageBlob;
-        vector<unsigned char> maskBlob;
-
-        try {
-            imageBlob = encodeImage(image);
-        } catch (const exception& e) {
-            cerr << "Error encoding image: " << e.what() << endl;
-        }
-
-        try {
-            maskBlob = encodeMask(mask);
-        } catch (const exception& e) {
-            cerr << "Error encoding mask: " << e.what() << endl;
-        }
-
-        cout << "Preparing to insert event:" << endl;
-        cout << "- Run ID: " << runId << endl;
-        cout << "- Color: " << color << endl;
-        cout << "- Pickup: " << pickup << endl;
-        cout << "- Real Coordinates: " << realCords << endl;
-        cout << "- Pic Coordinates: " << picCords << endl;
-        cout << "- HSV Lower: " << hsvLower << endl;
-        cout << "- HSV Upper: " << hsvUpper << endl;
-        cout << "- Image Size: " << imageBlob.size() << " bytes" << endl;
-        cout << "- Mask Size: " << maskBlob.size() << " bytes" << endl;
-
         string sql = "INSERT INTO pick_events (run_id, timeStamp, color, pickup, realPos, picPos, hsvLower, hsvUpper, image, mask) "
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -295,4 +308,28 @@ bool DataLogger::logEvent(
         cerr << "Exception in logEvent: " << e.what() << endl;
         return false;
     }
+}
+
+bool DataLogger::logEvent(
+    const string _color,
+    const bool _pickup, 
+    const vector<double> _realCord, 
+    const Point _picCord,
+    const string _image,
+    const cv::Mat _mask
+) {
+    color = _color;
+    pickup = _pickup;
+    realCord = vectorToString(_realCord);
+    picCord = vectorToString{static_cast<double>(mmCenter.x), static_cast<double>(mmCenter.y)};
+    mask = _mask;
+
+    setHsvRange();
+
+    string imagePath = cfg->get<string>("cvCfg","imagePath");
+    imageBlob = encodeImage(imagePath);
+    maskBlob = encodeMask(mask);
+
+    db.writeEvent();
+    cout << "Saved data" << endl;
 }
