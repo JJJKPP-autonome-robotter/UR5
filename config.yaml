@@ -78,20 +78,20 @@ cvCfg:
   imagePath: input.jpg
   cameraPort: 4
   debug: true
-  colorToPick: [red, orange]
+  colorToPick: [green, red, blue, yellow, orange, brown]
 color_ranges:
   red:
-    - [0, 120, 100]
+    - [0, 150, 150]
     - [10, 255, 255]
   red2:
-    - [170, 120, 100]
+    - [170, 150, 150]
     - [180, 255, 255]
   blue:
     - [100, 150, 100]
     - [110, 255, 255]
   green:
-    - [50, 100, 160]
-    - [60, 180, 255]
+    - [35, 50, 50]
+    - [85, 255, 255]
   orange:
     - [10, 180, 100]
     - [18, 255, 255]
