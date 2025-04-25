@@ -21,7 +21,7 @@ public:
     pair<Point, string> detectAll(const vector<string>& selectedColors, const vector<Point2f>& robotCenters);  // Updated to include robotCenters
     void setHsvRange(ConfigFile* cfg);
 
-    Mat getMask();
+    vector<Mat> getMask();
 
 private:
     void preprocess(string color);

@@ -124,6 +124,8 @@ vector<unsigned char> DataLogger::encodeImage(const string &path) {
     } catch (const exception& e) {
         cerr << "Error encoding image: " << e.what() << endl;
     }
+
+    return vector<unsigned char>();
 }
 
 vector<unsigned char> DataLogger::encodeMask(const cv::Mat& mask) {
@@ -139,6 +141,8 @@ vector<unsigned char> DataLogger::encodeMask(const cv::Mat& mask) {
     } catch (const exception& e) {
         cerr << "Error encoding mask: " << e.what() << endl;
     }
+
+    return vector<unsigned char>();
 }
 
 string DataLogger::vectorToString(const vector<double>& vector) {
@@ -152,24 +156,33 @@ string DataLogger::vectorToString(const vector<double>& vector) {
 }
 
 void DataLogger::setHsvRange() {
+    vector<double> lower;
+    vector<double> upper;
     if (color == "red") {
         cout << "REDSAVE" << endl;
         vector<vector<double>> range1 = cfg->get<vector<vector<double>>>("color_ranges","red");
         vector<vector<double>> range2 = cfg->get<vector<vector<double>>>("color_ranges","red2");
-        hsvLower.insert(hsvLower.end(), range1[0].begin(), range1[0].end());
-        hsvLower.insert(hsvLower.end(), range2[0].begin(), range2[0].end());
-        hsvUpper.insert(hsvUpper.end(), range1[1].begin(), range1[1].end());
-        hsvUpper.insert(hsvUpper.end(), range2[1].begin(), range2[1].end());
+        lower.insert(lower.end(), range1[0].begin(), range1[0].end());
+        lower.insert(lower.end(), range2[0].begin(), range2[0].end());
+        upper.insert(upper.end(), range1[1].begin(), range1[1].end());
+        upper.insert(upper.end(), range2[1].begin(), range2[1].end());
 
         cout << "REDSAVEDONE" << endl;
         return;
     }
 
     cout << "OTHER COLOR SAVE" << endl;
+    cout << color << endl;
     vector<vector<double>> range = cfg->get<vector<vector<double>>>("color_ranges", color);
-    hsvLower.insert(hsvLower.end(), range[0].begin(), range[0].end());
-    hsvUpper.insert(hsvUpper.end(), range[1].begin(), range[1].end());
+    lower.insert(lower.end(), range[0].begin(), range[0].end());
+    upper.insert(upper.end(), range[1].begin(), range[1].end());
     cout << "OTHER COLOR DONE" << endl;
+
+    hsvLower = vectorToString(lower);
+    hsvUpper = vectorToString(upper);
+
+    cout << "HSVLOWER: " << hsvLower << endl;
+    cout << "HSVUPPER: " << hsvUpper << endl;
 
 }
 
@@ -319,6 +332,6 @@ bool DataLogger::logEvent(
     imageBlob = encodeImage(imagePath);
     maskBlob = encodeMask(_mask);
 
-    writeEvent();
-    cout << "Saved data" << endl;
+    return writeEvent();
+    
 }

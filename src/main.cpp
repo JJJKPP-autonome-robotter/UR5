@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "../headers/systemInit.hpp"
-#include <vector>
 
 using namespace std;
 
@@ -32,8 +32,14 @@ void mainLoop(bool dbActive, DataLogger& db) {
         pickup = ur5->pickUp(color, mm);
 
         if (dbActive) {
-            cv::Mat mask = processor.getMask();
-            db.logEvent(color, pickup, mm, mmCenter, mask);
+            vector<cv::Mat> masks = processor.getMask();
+            auto it = find(selectedColors.begin(), selectedColors.end(), color);
+            if (it != selectedColors.end()) {
+                size_t index = distance(selectedColors.begin(), it);
+                cv::Mat mask = masks[index];
+                db.logEvent(color, pickup, mm, mmCenter, mask);
+            }
+            
         }
     }
 }

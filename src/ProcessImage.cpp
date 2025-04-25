@@ -219,6 +219,6 @@ vector<pair<Point, string>> ProcessImage::getCenters() const {
     return centers;
 }
 
-Mat ProcessImage::getMask() {
-    return mask;
+vector<Mat> ProcessImage::getMask() {
+    return allMasks;
 }
