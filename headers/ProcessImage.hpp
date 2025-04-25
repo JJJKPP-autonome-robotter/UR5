@@ -34,6 +34,9 @@ private:
     Mat hsv;
     Mat mask;
     Mat output;
+
+    vector<Mat> allMasks;
+
     vector<pair<Point, string>> centers;  // Updated to store Point and color
     map<string, pair<Scalar, Scalar>> colorRanges;
 };

@@ -99,6 +99,7 @@ void ProcessImage::preprocess(string color) {
     morphologyEx(mask, mask, MORPH_OPEN, kernel); // remove samll noise and isolate object
     dilate(mask, mask, kernel, Point(-1, -1), 2); // extra iterations if needed
 
+    allMasks.push_back(mask.clone());
 }
 
 
@@ -176,6 +177,7 @@ pair<Point, string> ProcessImage::detectAll(const vector<string>& selectedColors
     getImage(); // Load the image
 
     centers.clear(); // clear previous points
+    allMasks.clear(); // clear previous masks
 
     for (const auto& color : selectedColors) {
         preprocess(color);
@@ -201,7 +203,8 @@ void ProcessImage::showResults() {
     
     namedWindow("Red M&Ms Mask", WINDOW_NORMAL);
     resizeWindow("Red M&Ms Mask", 1280, 720);
-    imshow("Red M&Ms Mask", mask);
+    imshow("Red M&Ms Mask", allMasks[0]); // Show the first mask
+   
 
     namedWindow("Detected Red M&Ms", WINDOW_NORMAL);
     resizeWindow("Detected Red M&Ms", 1280, 720);
