@@ -22,11 +22,18 @@ void MainWindow::setupUI()
     leftLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     leftLayout->setSpacing(20);
 
+    // Read the initial state from the config file
+    std::vector<std::string> initialColors = config.get<std::vector<std::string>>("cvCfg", "colorToPick");
+
     for (int i = 0; i < toggles.size(); ++i)
     {
         QPushButton *btn = new QPushButton(colorNames[i], this);
         btn->setCheckable(true);
-        btn->setChecked(true); // Start checked
+
+        // Set the initial state based on the config
+        bool isChecked = std::find(initialColors.begin(), initialColors.end(), colorNames[i].toStdString()) != initialColors.end();
+        btn->setChecked(isChecked);
+
         btn->setFixedSize(300, 100);
         btn->setStyleSheet(R"(
             QPushButton {

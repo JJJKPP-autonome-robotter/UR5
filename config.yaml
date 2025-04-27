@@ -81,10 +81,6 @@ cvCfg:
   colorToPick:
     - red
     - orange
-    - yellow
-    - green
-    - blue
-    - brown
 color_ranges:
   red:
     - [0, 150, 150]
