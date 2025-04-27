@@ -119,6 +119,7 @@ pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
         }
 
         processor.showResults();  // Debug
+        processor.saveImageWithCenters("show.jpg");
     }
 
     return toPick; // return point and color

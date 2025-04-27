@@ -69,7 +69,9 @@ int main(int argc, char *argv[])
     MainWindow gui;
     gui.show();
 
-
+    QTimer *timer = new QTimer(&gui);
+    QObject::connect(timer, &QTimer::timeout, &gui, &MainWindow::refreshImage);
+    timer->start(1000); // 1000 ms = 1 second
 
     // Launch robot logic in separate thread
     //thread robotThread(robotLogic);

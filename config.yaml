@@ -82,6 +82,7 @@ cvCfg:
     - red
     - orange
     - yellow
+    - green
     - blue
     - brown
 color_ranges:

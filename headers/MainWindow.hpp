@@ -14,6 +14,7 @@ class MainWindow : public QWidget {
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
+    void refreshImage(); // Slot to refresh the image
 
 private:
     std::array<QPushButton *, 6> toggles; // Array of toggle buttons
@@ -27,7 +28,7 @@ private:
 
 private slots:
     void saveConfig();   // Declare saveConfig
-    void refreshImage(); // Slot to refresh the image
+    
 };
 
 #endif // MAINWINDOW_HPP

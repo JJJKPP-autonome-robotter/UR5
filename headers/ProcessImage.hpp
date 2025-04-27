@@ -17,6 +17,7 @@ public:
     ProcessImage(const string& imagePath);
     void detectMMS(const string& color, const vector<Point2f>& robotCenters);  // Updated to match implementation
     void showResults();
+    void saveImageWithCenters(const string& filename);
     vector<pair<Point, string>> getCenters() const;  // Updated to return Point and color
     pair<Point, string> detectAll(const vector<string>& selectedColors, const vector<Point2f>& robotCenters);  // Updated to include robotCenters
     void setHsvRange(ConfigFile* cfg);

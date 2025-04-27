@@ -51,9 +51,16 @@ void MainWindow::setupUI()
 
     // Right section: Image display
     imageLabel = new QLabel(this);
-    QPixmap pixmap("input.jpg"); // Load the image
-    imageLabel->setPixmap(pixmap.scaled(800, 800, Qt::KeepAspectRatio, Qt::SmoothTransformation)); // Scale the image to larger dimensions
-    imageLabel->setAlignment(Qt::AlignCenter);
+    QPixmap pixmap;
+    if (QFile::exists("show.jpg")) { // Check if the file exists
+    
+        pixmap.load("show.jpg"); // Load the image
+        imageLabel->setPixmap(pixmap.scaled(800, 800, Qt::KeepAspectRatio, Qt::SmoothTransformation)); // Scale the image
+    }
+    else {
+        imageLabel->setText("Image not found"); // Display a placeholder text
+        imageLabel->setAlignment(Qt::AlignCenter);
+    }
 
     // Add left and right sections to the main layout with stretch factors
     QWidget *leftWidget = new QWidget(this);
@@ -81,7 +88,7 @@ void MainWindow::saveConfig() {
 
 void MainWindow::refreshImage()
 {
-    QPixmap pixmap("input.jpg");
+    QPixmap pixmap("show.jpg");
     if (!pixmap.isNull()) // Check if the image exists and is valid
     {
         imageLabel->setPixmap(pixmap.scaled(800, 800, Qt::KeepAspectRatio, Qt::SmoothTransformation)); // Scale the image to larger dimensions
