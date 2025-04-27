@@ -53,6 +53,8 @@ void calibrateSystem() {
         pixelToRobot->showResults();
     }
 
+    pixelToRobot->saveImageWithCenters("show.jpg");
+
     // Set reference points
     vector<double> refPoint1 = cfg.get<vector<double>>("robotCfg", "refPoint1");
     vector<double> refPoint2 = cfg.get<vector<double>>("robotCfg", "refPoint2");
@@ -117,10 +119,11 @@ pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
             cout << "Color: " << center.second
                  << ", Coordinates: (" << center.first.x << ", " << center.first.y << ")" << endl;
         }
-
         processor.showResults();  // Debug
-        processor.saveImageWithCenters("show.jpg");
+
     }
+
+    processor.saveImageWithCenters("show.jpg");
 
     return toPick; // return point and color
 }
