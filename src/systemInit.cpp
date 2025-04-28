@@ -43,15 +43,17 @@ void initializeRobot() {
 void calibrateSystem() {
     // Initialize PixelToRobot
     string imagePath = cfg.get<string>("cvCfg", "imagePath");
-
+    
     camera.captureAndSave(imagePath);
 
-    pixelToRobot = new PixelToRobot("input.jpg");
+    pixelToRobot = new PixelToRobot(imagePath);
     pixelToRobot->calibrate(&cfg);
 
     if (DEBUG) {
         pixelToRobot->showResults();
     }
+
+    pixelToRobot->saveImageWithCenters("show.jpg");
 
     // Set reference points
     vector<double> refPoint1 = cfg.get<vector<double>>("robotCfg", "refPoint1");
@@ -95,7 +97,7 @@ void calibrateSystem() {
 
 pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
     // Capture and save image
-    string imagePath = cfg.get<string>("cvCfg","imagePath");
+    string imagePath = cfg.get<string>("cvCfg", "imagePath");
     if (camera.captureAndSave(imagePath)) {
         cout << "Image successfully captured and saved!" << endl;
     } else {
@@ -105,26 +107,23 @@ pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
 
     processor.setHsvRange(&cfg);
 
-    pair<Point, string>
-    toPick = processor.detectAll(selectedColors);
+    cout << pixelToRobot->centers.size() << endl;
+
+    // find all centers
+    pair<Point, string> toPick = processor.detectAll(selectedColors, pixelToRobot->centers);
     vector<pair<Point, string>> centers = processor.getCenters();
 
-
-    if (DEBUG){
+    if (DEBUG) {
         cout << "Number of detected centers: " << centers.size() << endl;
         for (const auto &center : centers) {
             cout << "Color: " << center.second
                  << ", Coordinates: (" << center.first.x << ", " << center.first.y << ")" << endl;
         }
-
         processor.showResults();  // Debug
-    }
- 
-    return toPick; // return point and color
-}
 
-DataLogger initDataLogger() {
-    string dbFile = cfg.get<string>("dataLogger","dbFileName");
-    DataLogger db = DataLogger(dbFile);
-    return db;
+    }
+
+    processor.saveImageWithCenters("show.jpg");
+
+    return toPick; // return point and color
 }

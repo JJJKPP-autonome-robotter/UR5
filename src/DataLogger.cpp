@@ -11,8 +11,9 @@ DataLogger::~DataLogger() {
     }
 }
 
-DataLogger::DataLogger(const string& dbFile) {
-    dbFileName = dbFile;
+DataLogger::DataLogger(ConfigFile* _cfg) {
+    cfg = _cfg;
+    dbFileName = cfg->get<string>("dataLogger","dbFileName");
     db = nullptr;
     runId = -1;
 
@@ -46,8 +47,11 @@ bool DataLogger::createTables() {
             run_id INTEGER NOT NULL,
             timeStamp TEXT NOT NULL,
             color TEXT,
+            pickup BOOLEAN,
             realPos TEXT,
             picPos TEXT,
+            hsvLower TEXT,
+            hsvUpper TEXT,
             image BLOB,
             mask BLOB,
             FOREIGN KEY(run_id) REFERENCES runs(id)
@@ -106,27 +110,39 @@ bool DataLogger::startNewRun() {
 }
 
 vector<unsigned char> DataLogger::encodeImage(const string &path) {
-    cv::Mat image = cv::imread(path, cv::IMREAD_COLOR);
+    try {
+        cv::Mat image = cv::imread(path, cv::IMREAD_COLOR);
 
-    if (image.empty()) {
-        cerr << "Warning: Cannot open image: " << path << endl;
-        return vector<unsigned char>();
+        if (image.empty()) {
+            cerr << "Warning: Cannot open image: " << path << endl;
+            return vector<unsigned char>();
+        }
+
+        vector<unsigned char> buffer;
+        cv::imencode(".jpg", image, buffer);
+        return buffer;
+    } catch (const exception& e) {
+        cerr << "Error encoding image: " << e.what() << endl;
     }
 
-    vector<unsigned char> buffer;
-    cv::imencode(".jpg", image, buffer);
-    return buffer;
+    return vector<unsigned char>();
 }
 
 vector<unsigned char> DataLogger::encodeMask(const cv::Mat& mask) {
-    if (mask.empty()) {
-        cerr << "Warning: Empty mask provided" << endl;
-        return vector<unsigned char>();
+    try {
+        if (mask.empty()) {
+            cerr << "Warning: Empty mask provided" << endl;
+            return vector<unsigned char>();
+        }
+
+        vector<unsigned char> buffer;
+        cv::imencode(".jpg", mask, buffer);
+        return buffer;
+    } catch (const exception& e) {
+        cerr << "Error encoding mask: " << e.what() << endl;
     }
 
-    vector<unsigned char> buffer;
-    cv::imencode(".jpg", mask, buffer);
-    return buffer;
+    return vector<unsigned char>();
 }
 
 string DataLogger::vectorToString(const vector<double>& vector) {
@@ -137,6 +153,37 @@ string DataLogger::vectorToString(const vector<double>& vector) {
     }
 
     return oss.str();
+}
+
+void DataLogger::setHsvRange() {
+    vector<double> lower;
+    vector<double> upper;
+    if (color == "red") {
+        cout << "REDSAVE" << endl;
+        vector<vector<double>> range1 = cfg->get<vector<vector<double>>>("color_ranges","red");
+        vector<vector<double>> range2 = cfg->get<vector<vector<double>>>("color_ranges","red2");
+        lower.insert(lower.end(), range1[0].begin(), range1[0].end());
+        lower.insert(lower.end(), range2[0].begin(), range2[0].end());
+        upper.insert(upper.end(), range1[1].begin(), range1[1].end());
+        upper.insert(upper.end(), range2[1].begin(), range2[1].end());
+
+        cout << "REDSAVEDONE" << endl;
+        return;
+    }
+
+    cout << "OTHER COLOR SAVE" << endl;
+    cout << color << endl;
+    vector<vector<double>> range = cfg->get<vector<vector<double>>>("color_ranges", color);
+    lower.insert(lower.end(), range[0].begin(), range[0].end());
+    upper.insert(upper.end(), range[1].begin(), range[1].end());
+    cout << "OTHER COLOR DONE" << endl;
+
+    hsvLower = vectorToString(lower);
+    hsvUpper = vectorToString(upper);
+
+    cout << "HSVLOWER: " << hsvLower << endl;
+    cout << "HSVUPPER: " << hsvUpper << endl;
+
 }
 
 void DataLogger::beginTransaction() {
@@ -150,6 +197,7 @@ void DataLogger::beginTransaction() {
             cerr << "Failed to begin transaction: " << errMsg << endl;
             sqlite3_free(errMsg);
         }
+
     }
     
 }
@@ -163,16 +211,13 @@ void DataLogger::commitTransaction() {
             cerr << "Failed to commit transaction: " << errMsg << endl;
             sqlite3_free(errMsg);
         }
+
     }
+
 }
 
-bool DataLogger::logEvent(
-    const string& color, 
-    const vector<double>& realCord, 
-    const vector<double>& picCord, 
-    const string& image,
-    const cv::Mat& mask 
-) {
+bool DataLogger::writeEvent() {
+
     if (!db) {
         cerr << "Database connection is null" << endl;
         return false;
@@ -187,37 +232,20 @@ bool DataLogger::logEvent(
     char timeStamp[100];
     strftime(timeStamp, sizeof(timeStamp), "%Y-%m-%d %H:%M:%S", localtime(&now));
 
-    string realCords = vectorToString(realCord);
-    string picCords = vectorToString(picCord);
-
-    //beginTransaction();
+    cout << "Preparing to insert event:" << endl;
+    cout << "- Run ID: " << runId << endl;
+    cout << "- Color: " << color << endl;
+    cout << "- Pickup: " << pickup << endl;
+    cout << "- Real Coordinates: " << realCords << endl;
+    cout << "- Pic Coordinates: " << picCords << endl;
+    cout << "- HSV Lower: " << hsvLower << endl;
+    cout << "- HSV Upper: " << hsvUpper << endl;
+    cout << "- Image Size: " << imageBlob.size() << " bytes" << endl;
+    cout << "- Mask Size: " << maskBlob.size() << " bytes" << endl;
 
     try {
-        vector<unsigned char> imageBlob;
-        vector<unsigned char> maskBlob;
-
-        try {
-            imageBlob = encodeImage(image);
-        } catch (const exception& e) {
-            cerr << "Error encoding image: " << e.what() << endl;
-        }
-
-        try {
-            maskBlob = encodeMask(mask);
-        } catch (const exception& e) {
-            cerr << "Error encoding mask: " << e.what() << endl;
-        }
-
-        cout << "Preparing to insert event:" << endl;
-        cout << "- Run ID: " << runId << endl;
-        cout << "- Color: " << color << endl;
-        cout << "- Real Coordinates: " << realCords << endl;
-        cout << "- Pic Coordinates: " << picCords << endl;
-        cout << "- Image Size: " << imageBlob.size() << " bytes" << endl;
-        cout << "- Mask Size: " << maskBlob.size() << " bytes" << endl;
-
-        string sql = "INSERT INTO pick_events (run_id, timeStamp, color, realPos, picPos, image, mask) "
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        string sql = "INSERT INTO pick_events (run_id, timeStamp, color, pickup, realPos, picPos, hsvLower, hsvUpper, image, mask) "
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         cout << "SQL: " << sql << endl;
         cout << "DB is " << (db ? "valid" : "null") << endl;
@@ -248,18 +276,21 @@ bool DataLogger::logEvent(
         if (sqlite3_bind_int(stmt, 1, runId) != SQLITE_OK) cerr << "Failed to bind run_id: " << sqlite3_errmsg(db) << endl;
         if (sqlite3_bind_text(stmt, 2, timeStamp, -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind timeStamp: " << sqlite3_errmsg(db) << endl;
         if (sqlite3_bind_text(stmt, 3, color.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind color: " << sqlite3_errmsg(db) << endl;
-        if (sqlite3_bind_text(stmt, 4, realCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind realPos: " << sqlite3_errmsg(db) << endl;
-        if (sqlite3_bind_text(stmt, 5, picCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind picPos: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_int(stmt, 4, pickup) != SQLITE_OK) cerr << "Failed to bind pickup: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 5, realCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind realPos: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 6, picCords.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind picPos: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 7, hsvLower.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind hsvLower: " << sqlite3_errmsg(db) << endl;
+        if (sqlite3_bind_text(stmt, 8, hsvUpper.c_str(), -1, SQLITE_TRANSIENT) != SQLITE_OK) cerr << "Failed to bind hsvUpper: " << sqlite3_errmsg(db) << endl;
         if (imageBlob.empty()) {
-            if (sqlite3_bind_null(stmt, 6) != SQLITE_OK) cerr << "Failed to bind null image: " << sqlite3_errmsg(db) << endl;
+            if (sqlite3_bind_null(stmt, 9) != SQLITE_OK) cerr << "Failed to bind null image: " << sqlite3_errmsg(db) << endl;
         } else {
-            if (sqlite3_bind_blob(stmt, 6, imageBlob.data(), imageBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
+            if (sqlite3_bind_blob(stmt, 9, imageBlob.data(), imageBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
                 cerr << "Failed to bind image: " << sqlite3_errmsg(db) << endl;
         }
         if (maskBlob.empty()) {
-            if (sqlite3_bind_null(stmt, 7) != SQLITE_OK) cerr << "Failed to bind null mask: " << sqlite3_errmsg(db) << endl;
+            if (sqlite3_bind_null(stmt, 10) != SQLITE_OK) cerr << "Failed to bind null mask: " << sqlite3_errmsg(db) << endl;
         } else {
-            if (sqlite3_bind_blob(stmt, 7, maskBlob.data(), maskBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
+            if (sqlite3_bind_blob(stmt, 10, maskBlob.data(), maskBlob.size(), SQLITE_TRANSIENT) != SQLITE_OK)
                 cerr << "Failed to bind mask: " << sqlite3_errmsg(db) << endl;
         }
 
@@ -274,8 +305,6 @@ bool DataLogger::logEvent(
 
         sqlite3_finalize(stmt);
 
-        //commitTransaction();
-
         cout << "Successfully logged pick event with ID: " << sqlite3_last_insert_rowid(db) << endl;
         return true;
 
@@ -283,4 +312,26 @@ bool DataLogger::logEvent(
         cerr << "Exception in logEvent: " << e.what() << endl;
         return false;
     }
+}
+
+bool DataLogger::logEvent(
+    const string _color,
+    const bool _pickup, 
+    const vector<double> _realCords, 
+    cv::Point _picCords,
+    const cv::Mat _mask
+) {
+    color = _color;
+    pickup = _pickup;
+    realCords = vectorToString(_realCords);
+    picCords = vectorToString({static_cast<double>(_picCords.x), static_cast<double>(_picCords.y)});
+
+    setHsvRange();
+
+    string imagePath = cfg->get<string>("cvCfg","imagePath");
+    imageBlob = encodeImage(imagePath);
+    maskBlob = encodeMask(_mask);
+
+    return writeEvent();
+    
 }

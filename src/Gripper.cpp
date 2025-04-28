@@ -7,7 +7,7 @@ Gripper::~Gripper() {
 
 // Constructor
 Gripper::Gripper(uint32_t _baudrate, vector<double> _offset, double _payload) : port(io) {
-    portName = findPort(); // Get device addres
+    portName = "/dev/ttyACM0"; //findPort(); // Get device addres
     baudrate = _baudrate;
     offset = _offset;
     payload = _payload;
@@ -51,6 +51,22 @@ bool Gripper::close() {
     if (closed) cout << "CLOSED" << endl;
 
     return closed;
+}
+
+bool Gripper::pickup() {
+    string message = "d";
+    send(message); // Sends distance message to gripper
+
+    string inputMessage;
+    while (true) {
+        inputMessage = read(); // Reads from pico
+
+        if (inputMessage == "error") return false;
+        if (inputMessage == "true") return true;
+        if (inputMessage == "false") return false;
+    }
+
+    return false;
 }
 
 // Send message to gripper

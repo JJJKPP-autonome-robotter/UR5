@@ -22,11 +22,18 @@ void MainWindow::setupUI()
     leftLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     leftLayout->setSpacing(20);
 
+    // Read the initial state from the config file
+    std::vector<std::string> initialColors = config.get<std::vector<std::string>>("cvCfg", "colorToPick");
+
     for (int i = 0; i < toggles.size(); ++i)
     {
         QPushButton *btn = new QPushButton(colorNames[i], this);
         btn->setCheckable(true);
-        btn->setChecked(true); // Start checked
+
+        // Set the initial state based on the config
+        bool isChecked = std::find(initialColors.begin(), initialColors.end(), colorNames[i].toStdString()) != initialColors.end();
+        btn->setChecked(isChecked);
+
         btn->setFixedSize(300, 100);
         btn->setStyleSheet(R"(
             QPushButton {
@@ -51,9 +58,16 @@ void MainWindow::setupUI()
 
     // Right section: Image display
     imageLabel = new QLabel(this);
-    QPixmap pixmap("input.jpg"); // Load the image
-    imageLabel->setPixmap(pixmap.scaled(800, 800, Qt::KeepAspectRatio, Qt::SmoothTransformation)); // Scale the image to larger dimensions
-    imageLabel->setAlignment(Qt::AlignCenter);
+    QPixmap pixmap;
+    if (QFile::exists("show.jpg")) { // Check if the file exists
+    
+        pixmap.load("show.jpg"); // Load the image
+        imageLabel->setPixmap(pixmap.scaled(800, 800, Qt::KeepAspectRatio, Qt::SmoothTransformation)); // Scale the image
+    }
+    else {
+        imageLabel->setText("Image not found"); // Display a placeholder text
+        imageLabel->setAlignment(Qt::AlignCenter);
+    }
 
     // Add left and right sections to the main layout with stretch factors
     QWidget *leftWidget = new QWidget(this);
@@ -81,7 +95,7 @@ void MainWindow::saveConfig() {
 
 void MainWindow::refreshImage()
 {
-    QPixmap pixmap("input.jpg");
+    QPixmap pixmap("show.jpg");
     if (!pixmap.isNull()) // Check if the image exists and is valid
     {
         imageLabel->setPixmap(pixmap.scaled(800, 800, Qt::KeepAspectRatio, Qt::SmoothTransformation)); // Scale the image to larger dimensions

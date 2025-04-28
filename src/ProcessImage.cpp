@@ -2,13 +2,27 @@
 #include "../headers/Data_saver.hpp" 
 
 // load image =D
-ProcessImage::ProcessImage(const string& imagePath) { 
+ProcessImage::ProcessImage(const string& path) { 
+    imagePath = path;
+
     image = imread(imagePath);
+    
     if (image.empty()) {
         cerr << "Error: Could not open or find the image!" << endl;
         exit(1);
     }
     output = image.clone(); 
+}
+
+void ProcessImage::getImage() {
+    image = imread(imagePath);
+
+    if (image.empty()) {
+        cerr << "Error: Could not open or find the image!" << endl;
+        exit(1);
+    }
+
+    output = image.clone();
 }
 
 void ProcessImage::setHsvRange(ConfigFile* cfg) {
@@ -85,20 +99,24 @@ void ProcessImage::preprocess(string color) {
     morphologyEx(mask, mask, MORPH_OPEN, kernel); // remove samll noise and isolate object
     dilate(mask, mask, kernel, Point(-1, -1), 2); // extra iterations if needed
 
+    allMasks.push_back(mask.clone());
 }
 
 
 // vector of points with color
 vector<pair<Point, string>> centers;
 
-
-void ProcessImage::detectContours(const string& color) {
+void ProcessImage::detectContours(const string& color, const vector<Point2f>& robotCenters) {
     vector<vector<Point>> contours;
     findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
+    // magic numbers need to be changed
     const double minArea = 1000.0;
     const double maxArea = 4000.0;
     const double maxAspectRatio = 1.40;
+
+    // Create a bounding rectangle from the robot centers
+    Rect robotBoundingBox = boundingRect(robotCenters);
 
     for (const auto& contour : contours) {
         double area = contourArea(contour);
@@ -110,21 +128,32 @@ void ProcessImage::detectContours(const string& color) {
         double aspectRatio = static_cast<double>(max(boundingBox.width, boundingBox.height)) /
                              static_cast<double>(min(boundingBox.width, boundingBox.height));
 
+        Point center;
         if (aspectRatio > maxAspectRatio) {
             if (boundingBox.width > boundingBox.height) {
                 Point center1(boundingBox.x + boundingBox.width / 4, boundingBox.y + boundingBox.height / 2);
                 Point center2(boundingBox.x + 3 * boundingBox.width / 4, boundingBox.y + boundingBox.height / 2);
-                centers.emplace_back(center1, color);
-                centers.emplace_back(center2, color);
+                if (robotBoundingBox.contains(center1)) {
+                    centers.emplace_back(center1, color);
+                }
+                if (robotBoundingBox.contains(center2)) {
+                    centers.emplace_back(center2, color);
+                }
             } else {
                 Point center1(boundingBox.x + boundingBox.width / 2, boundingBox.y + boundingBox.height / 4);
                 Point center2(boundingBox.x + boundingBox.width / 2, boundingBox.y + 3 * boundingBox.height / 4);
-                centers.emplace_back(center1, color);
-                centers.emplace_back(center2, color);
+                if (robotBoundingBox.contains(center1)) {
+                    centers.emplace_back(center1, color);
+                }
+                if (robotBoundingBox.contains(center2)) {
+                    centers.emplace_back(center2, color);
+                }
             }
         } else {
-            Point center(boundingBox.x + boundingBox.width / 2, boundingBox.y + boundingBox.height / 2);
-            centers.emplace_back(center, color);
+            center = Point(boundingBox.x + boundingBox.width / 2, boundingBox.y + boundingBox.height / 2);
+            if (robotBoundingBox.contains(center)) {
+                centers.emplace_back(center, color);
+            }
         }
     }
 
@@ -133,22 +162,26 @@ void ProcessImage::detectContours(const string& color) {
     }
 }
 
-
 // detect specific color
 // stored in centers
-void ProcessImage::detectMMS(string color) {
-    centers.clear(); // clear previous centers
+void ProcessImage::detectMMS(const string& color, const vector<Point2f>& robotCenters) {
+    getImage(); // Load the image
+
+    centers.clear();  // clear previous centers
     preprocess(color);
-    detectContours(color);
+    detectContours(color, robotCenters); // Pass robotCenters to detectContours
 }
 
 // detectAll to return the point with the color
-pair<Point, string> ProcessImage::detectAll(const vector<string>& selectedColors) {
-    centers.clear(); // clear previous points
+pair<Point, string> ProcessImage::detectAll(const vector<string>& selectedColors, const vector<Point2f>& robotCenters) {
+    getImage(); // Load the image
 
-    for (const auto &color : selectedColors) {
+    centers.clear(); // clear previous points
+    allMasks.clear(); // clear previous masks
+
+    for (const auto& color : selectedColors) {
         preprocess(color);
-        detectContours(color); 
+        detectContours(color, robotCenters); // Pass robotCenters to detectContours
     }
 
     // sort centers by y and x coordinates
@@ -170,7 +203,7 @@ void ProcessImage::showResults() {
     
     namedWindow("Red M&Ms Mask", WINDOW_NORMAL);
     resizeWindow("Red M&Ms Mask", 1280, 720);
-    imshow("Red M&Ms Mask", mask);
+    imshow("Red M&Ms Mask", allMasks[0]); // Show the first mask
 
     namedWindow("Detected Red M&Ms", WINDOW_NORMAL);
     resizeWindow("Detected Red M&Ms", 1280, 720);
@@ -185,6 +218,12 @@ vector<pair<Point, string>> ProcessImage::getCenters() const {
     return centers;
 }
 
-Mat ProcessImage::getMask() {
-    return mask;
+vector<Mat> ProcessImage::getMask() {
+    return allMasks;
+}
+
+void ProcessImage::saveImageWithCenters(const string& filename) {
+    // Save the output image with center dots
+    imwrite(filename, output);
+    cout << "Image saved as " << filename << endl;
 }

@@ -21,6 +21,7 @@ public:
     // Methods
     bool open(); // Opens gripper
     bool close(); // Closes gripper
+    bool pickup(); // Check if gripper has successfull pickup
     void send(const string&); // Sends message
     string read(); // Reads unkown length response
     bool waitForTargetMessage(string); // Waits for target message

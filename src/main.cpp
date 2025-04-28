@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
+
 
 
 #include "../headers/systemInit.hpp"
@@ -34,17 +36,18 @@ void mainLoop(bool dbActive, DataLogger& db) {
              << "Robot (" << robotCoord.x << ", " << robotCoord.y << ")" << endl;
 
         vector<double> mm = {robotCoord.x, robotCoord.y};
-        ur5->pickUp(color, mm);
+        bool pickup = false;
+        pickup = ur5->pickUp(color, mm);
 
         if (dbActive) {
-            string& dbColor = color;
-            vector<double>& dbRealCoord = mm;
-            vector<double> dbPicCoord = {static_cast<double>(mmCenter.x), static_cast<double>(mmCenter.y)};
-            string image = cfg.get<string>("cvCfg","imagePath");
-            cv::Mat mask = processor.getMask();
-
-            db.logEvent(dbColor, dbRealCoord, dbPicCoord, image, mask);
-            cout << "Saved data" << endl;
+            vector<cv::Mat> masks = processor.getMask();
+            auto it = find(selectedColors.begin(), selectedColors.end(), color);
+            if (it != selectedColors.end()) {
+                size_t index = distance(selectedColors.begin(), it);
+                cv::Mat mask = masks[index];
+                db.logEvent(color, pickup, mm, mmCenter, mask);
+            }
+            
         }
     }
 }
@@ -54,7 +57,7 @@ int robotLogic() {
     calibrateSystem();
 
     bool dbActive = cfg.get<bool>("dataLogger","active");
-    DataLogger db = dbActive ? initDataLogger() : DataLogger();
+    DataLogger db = dbActive ? DataLogger(&cfg) : DataLogger();
     
     mainLoop(dbActive, db);
     return 0;
@@ -67,7 +70,9 @@ int main(int argc, char *argv[])
     MainWindow gui;
     gui.show();
 
-
+    QTimer *timer = new QTimer(&gui);
+    QObject::connect(timer, &QTimer::timeout, &gui, &MainWindow::refreshImage);
+    timer->start(1000); // 1000 ms = 1 second
 
     // Launch robot logic in separate thread
     //thread robotThread(robotLogic);
