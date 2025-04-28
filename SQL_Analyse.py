@@ -37,14 +37,17 @@ def get_average_time(events_data):
 
     events_data['time_diff'] = events_data['timeStamp'].diff().dt.total_seconds()
 
+    # Calculate Average time for successful picks
     success = events_data[events_data['pickup'] == 1]
     success = success.sort_values('timeStamp')
     success['time_diff'] = success['timeStamp'].diff().dt.total_seconds()
 
+    # Calculate Average time for faield picks
     failed = events_data[events_data['pickup'] == 0]
     failed = failed.sort_values('timeStamp')
     failed['time_diff'] = failed['timeStamp'].diff().dt.total_seconds()
 
+    # Calculate the Average time for picks
     overall_avg = events_data['time_diff'].mean()
     success_avg = success['time_diff'].mean()
     failed_avg = failed['time_diff'].mean()
