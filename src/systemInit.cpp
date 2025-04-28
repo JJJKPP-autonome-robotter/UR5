@@ -50,7 +50,7 @@ void calibrateSystem() {
     pixelToRobot->calibrate(&cfg);
 
     if (DEBUG) {
-        pixelToRobot->showResults();
+        //pixelToRobot->showResults();
     }
 
     pixelToRobot->saveImageWithCenters("show.jpg");
@@ -119,7 +119,7 @@ pair<Point, string> captureAndProcess(const vector<string> &selectedColors) {
             cout << "Color: " << center.second
                  << ", Coordinates: (" << center.first.x << ", " << center.first.y << ")" << endl;
         }
-        processor.showResults();  // Debug
+        //processor.showResults();  // Debug
 
     }
 

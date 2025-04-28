@@ -76,11 +76,13 @@ gripperCfg:
   payload: 0.01
 cvCfg:
   imagePath: input.jpg
-  cameraPort: 0
+  cameraPort: 4
   debug: true
   colorToPick:
     - red
     - orange
+    - yellow
+    - blue
 color_ranges:
   red:
     - [0, 150, 150]

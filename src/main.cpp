@@ -75,17 +75,17 @@ int main(int argc, char *argv[])
     timer->start(1000); // 1000 ms = 1 second
 
     // Launch robot logic in separate thread
-    //thread robotThread(robotLogic);
+    thread robotThread(robotLogic);
 
     // Start GUI loop
     int result = app.exec();
 
-    /*
+    
     // Join the robot thread before exiting
     if (robotThread.joinable())
     {
         robotThread.join();
     }
-    */
+    
     return result;
 }
