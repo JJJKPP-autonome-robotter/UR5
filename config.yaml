@@ -81,12 +81,6 @@ cvCfg:
   colorToPick:
     - red
     - orange
-<<<<<<< HEAD
-    - yellow
-    - blue
-    - brown
-=======
->>>>>>> fa16e00c7df50819730b8a2fda7f181fc79d9716
 color_ranges:
   red:
     - [0, 150, 150]
