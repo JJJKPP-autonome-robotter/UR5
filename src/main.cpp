@@ -3,7 +3,15 @@
 #include <vector>
 #include <algorithm>
 
+
+
 #include "../headers/systemInit.hpp"
+
+#include "../headers/MainWindow.hpp"
+
+#include <QApplication>
+#include <QTimer>
+#include <thread>
 
 using namespace std;
 
@@ -44,7 +52,7 @@ void mainLoop(bool dbActive, DataLogger& db) {
     }
 }
 
-int main() {
+int robotLogic() {
     initializeRobot();
     calibrateSystem();
 
@@ -53,4 +61,31 @@ int main() {
     
     mainLoop(dbActive, db);
     return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    MainWindow gui;
+    gui.show();
+
+    QTimer *timer = new QTimer(&gui);
+    QObject::connect(timer, &QTimer::timeout, &gui, &MainWindow::refreshImage);
+    timer->start(1000); // 1000 ms = 1 second
+
+    // Launch robot logic in separate thread
+    thread robotThread(robotLogic);
+
+    // Start GUI loop
+    int result = app.exec();
+
+    
+    // Join the robot thread before exiting
+    if (robotThread.joinable())
+    {
+        robotThread.join();
+    }
+    
+    return result;
 }

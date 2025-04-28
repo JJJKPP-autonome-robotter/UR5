@@ -204,7 +204,6 @@ void ProcessImage::showResults() {
     namedWindow("Red M&Ms Mask", WINDOW_NORMAL);
     resizeWindow("Red M&Ms Mask", 1280, 720);
     imshow("Red M&Ms Mask", allMasks[0]); // Show the first mask
-   
 
     namedWindow("Detected Red M&Ms", WINDOW_NORMAL);
     resizeWindow("Detected Red M&Ms", 1280, 720);
@@ -221,4 +220,10 @@ vector<pair<Point, string>> ProcessImage::getCenters() const {
 
 vector<Mat> ProcessImage::getMask() {
     return allMasks;
+}
+
+void ProcessImage::saveImageWithCenters(const string& filename) {
+    // Save the output image with center dots
+    imwrite(filename, output);
+    cout << "Image saved as " << filename << endl;
 }

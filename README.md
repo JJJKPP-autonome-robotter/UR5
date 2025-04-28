@@ -32,6 +32,15 @@ For data collection install SQLite3
     sudo apt install libsqlite3-dev sqlite3
 ```
 
+### QT6
+For GUI
+```bash
+sudo apt install qt6-base-dev qt6-tools-dev qt6-tools-dev-tools
+```
+
+```bash
+qmake6 --version
+```
 
 ### Robot setup
 To control the robot over Ethernet. Make sure to install the URCap External Control.<br>

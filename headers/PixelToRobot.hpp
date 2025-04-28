@@ -21,6 +21,8 @@ public:
     // Functions to process the image and detect points
     void findPoints();
     void showResults();
+    void saveImageWithCenters(const string& filename);
+
     vector<Point2f> getCenters() const;
     void calibrate(ConfigFile* cfg);
     void setHsvRange(ConfigFile* cfg);

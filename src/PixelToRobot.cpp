@@ -118,6 +118,12 @@ void PixelToRobot::showResults() {
     destroyAllWindows();
 }
 
+void PixelToRobot::saveImageWithCenters(const string& filename) {
+    // Save the output image with center dots
+    imwrite(filename, output);
+    cout << "Saved Calibration image as " << filename << endl;
+}
+
 vector<Point2f> PixelToRobot::getCenters() const {
     return centers;
 }
