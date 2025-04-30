@@ -202,6 +202,18 @@ void DataLogger::beginTransaction() {
     
 }
 
+bool DataLogger::clearVar() {
+    color.clear();
+    pickup = false;
+    realCords.clear();
+    picCords.clear();
+    hsvLower.clear();
+    hsvUpper.clear();
+    imageBlob.clear();
+    maskBlob.clear();
+    return true;
+}
+
 void DataLogger::commitTransaction() {
     if (!db) return;
 
@@ -332,6 +344,9 @@ bool DataLogger::logEvent(
     imageBlob = encodeImage(imagePath);
     maskBlob = encodeMask(_mask);
 
-    return writeEvent();
+    if (writeEvent()) {
+       return clearVar();
+    }
     
+    return false;
 }

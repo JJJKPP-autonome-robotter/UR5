@@ -39,6 +39,7 @@ private:
     vector<unsigned char> encodeImage(const string& path);
     vector<unsigned char> encodeMask(const cv::Mat& mask);
     void setHsvRange();
+    bool clearVar();
 
     string color;
     bool pickup;
