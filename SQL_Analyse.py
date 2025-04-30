@@ -4,10 +4,12 @@ import cv2
 import pandas as pd
 import ast
 
+
 # Opens the database
 def connect_db(db_path):
     db = sqlite3.connect(db_path)
     return db
+
 
 # Gets events from the database
 def fetch_events(db):
@@ -15,11 +17,13 @@ def fetch_events(db):
     data = pd.read_sql_query(query, db)
     return data
 
+
 # Gets runs from the database
 def fetch_runs(db):
     query = "SELECT * FROM runs"
     data = pd.read_sql_query(query, db)
     return data
+
 
 # Gets total picks and picks per color
 def get_picks(events_data):
@@ -37,6 +41,7 @@ def get_picks(events_data):
     print("\n=== PICkS ===")
     for key, value in stats.items():
         print(f"{key}: {value}")
+
 
 # Finds average time for pick
 def get_average_time(events_data):
@@ -107,6 +112,7 @@ def get_average_time(events_data):
     print(f"Failed Picks: {final_failed_avg:.2f} seconds" if failed_averages else "No failed picks data")
     print(f"Overall Picks: {final_overall_avg:.2f} seconds" if overall_averages else "No picks data")
 
+
 def get_success_rate(events_data):
     if 'pickup' in events_data.columns:
         pickup_counts = events_data['pickup'].value_counts()
@@ -124,6 +130,7 @@ def get_success_rate(events_data):
             success_rate = succes_rates.loc[color].get(1, 0)
             print(f"{color}: {success_rate * 100:.2f}% Success Rate")
 
+
 def show_pick_event_details(event_row):
     img_array = np.frombuffer(event_row['image'], dtype=np.uint8)
     img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
@@ -135,9 +142,6 @@ def show_pick_event_details(event_row):
     x_str, y_str = map(str.strip, coord_str.split(','))
     center_x = int(x_str)
     center_y = int(y_str)
-
-    
-    
 
     if img is not None:
         cv2.circle(img, (center_x, center_y), radius=5, color=(255, 255, 0), thickness=-1)
@@ -168,6 +172,7 @@ def show_pick_event_details(event_row):
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
 
 def show_run_details(events_data):
     while True:
@@ -224,6 +229,7 @@ def show_run_details(events_data):
 
         else:
             print(f"No failed pick found for color '{color}'")
+
 
 def main(db_path):
     db = connect_db(db_path)
