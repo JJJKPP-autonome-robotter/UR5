@@ -168,15 +168,15 @@ void DataLogger::setHsvRange() {
         upper.insert(upper.end(), range2[1].begin(), range2[1].end());
 
         cout << "REDSAVEDONE" << endl;
-        return;
+        
+    } else {
+        cout << "OTHER COLOR SAVE" << endl;
+        cout << color << endl;
+        vector<vector<double>> range = cfg->get<vector<vector<double>>>("color_ranges", color);
+        lower.insert(lower.end(), range[0].begin(), range[0].end());
+        upper.insert(upper.end(), range[1].begin(), range[1].end());
+        cout << "OTHER COLOR DONE" << endl;
     }
-
-    cout << "OTHER COLOR SAVE" << endl;
-    cout << color << endl;
-    vector<vector<double>> range = cfg->get<vector<vector<double>>>("color_ranges", color);
-    lower.insert(lower.end(), range[0].begin(), range[0].end());
-    upper.insert(upper.end(), range[1].begin(), range[1].end());
-    cout << "OTHER COLOR DONE" << endl;
 
     hsvLower = vectorToString(lower);
     hsvUpper = vectorToString(upper);
