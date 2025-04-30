@@ -344,6 +344,7 @@ void RobotArm::setRefPoints(vector<double> ref1, vector<double> ref2, vector<dou
     refPoint3 = ref3;
 }
 
+// Sets drop points for the colors takes undardered_map['color', vector coordinates]
 void RobotArm::setDropPoints(unordered_map<string, vector<double>> _dropPoints) {
     dropPoints = _dropPoints;
 }

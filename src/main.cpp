@@ -10,7 +10,6 @@
 #include "../headers/MainWindow.hpp"
 
 
-
 using namespace std;
 
 void mainLoop(bool dbActive, DataLogger& db) {
