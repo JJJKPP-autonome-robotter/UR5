@@ -22,6 +22,7 @@ robotCfg:
     - 0
     - 0
   basePos: [0.03639, -0.23713, 0.43206, 3.14, 0, 0]
+  pickupHeight: [-0.0225, 3.14, 0, 0]
   velocity: 0.25
   acceleration: 0.25
   dt: 0.002

@@ -20,7 +20,7 @@ public:
     RobotArm();
     ~RobotArm();
     // Constructor param IP, Velocity, Accelerations, Frequency, Lookahead_time, gain, vector 6 joint agnles in rad
-    RobotArm(string, double, double, double, double, double, vector<double>, Gripper*);
+    RobotArm(string, double, double, double, double, double, vector<double>, vector<double>, Gripper*);
 
     // Methods
     void connect();// Connects to Robot arm
@@ -72,6 +72,7 @@ private:
     vector<double> refPoint1;
     vector<double> refPoint2;
     vector<double> refPoint3;
+    vector<double> pickupHeight;
     unordered_map<string, vector<double>> dropPoints;
 
     // Privat functions

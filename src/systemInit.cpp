@@ -26,6 +26,7 @@ void initializeRobot() {
     double lookaheadTime = cfg.get<double>("robotCfg", "lookaheadTime");
     double gain = cfg.get<double>("robotCfg", "gain");
     vector<double> basePos = cfg.get<vector<double>>("robotCfg", "basePos");
+    vector<double> pickupHeight = cfg.get<vector<double>>("robotCfg","pickupHeight");
 
     // Gripper variables
     uint32_t gripperPortBaudrate = cfg.get<uint32_t>("gripperCfg", "baudrate");
@@ -36,7 +37,7 @@ void initializeRobot() {
     gripper = new Gripper(gripperPortBaudrate, tcpOffset, payload);
 
     // Initialize robot and connect
-    ur5 = new RobotArm(ip, velocity, acceleration, dt, lookaheadTime, gain, basePos, gripper);
+    ur5 = new RobotArm(ip, velocity, acceleration, dt, lookaheadTime, gain, basePos, pickupHeight, gripper);
     ur5->connect();
 }
 

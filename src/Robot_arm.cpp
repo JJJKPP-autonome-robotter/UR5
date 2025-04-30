@@ -15,7 +15,17 @@ RobotArm::~RobotArm() {
 }
 
 // Constructor params IP of robot, velocity, acceleration, frequency, lookahead_time, gain, vecotr of 6 with anlge in rad for each joint
-RobotArm::RobotArm(string _ip, double _velocity, double _acceleration, double _dt, double _lookaheadTime, double _gain, vector<double> _basePos, Gripper* _gripper){
+RobotArm::RobotArm(
+    string _ip, 
+    double _velocity, 
+    double _acceleration, 
+    double _dt, 
+    double _lookaheadTime, 
+    double _gain, 
+    vector<double> _basePos, 
+    vector<double> _pickupHeight, 
+    Gripper* _gripper
+){
     ip = _ip; // Sets IP
     velocity = _velocity; // Set velocity
     acceleration = _acceleration; // Sets acceleration
@@ -23,6 +33,7 @@ RobotArm::RobotArm(string _ip, double _velocity, double _acceleration, double _d
     lookaheadTime = _lookaheadTime; // Sets lookahead_time
     gain = _gain; // Sets gain
     basePos = _basePos; // Sets base position vecot of 6 with joint angles in rad
+    pickupHeight = _pickupHeight; // Sets pickup height
     gripper = _gripper; // Sets gripper class
 
 }
@@ -204,14 +215,14 @@ bool RobotArm::confirmPoint(vector<double>& refPoint) {
 bool RobotArm::pickUp(string color, vector<double> point) {
     double _velocity = 0.1; // Pick up velocity
 
-    point.insert(point.end(), {-0.0225, 3.14, 0, 0}); // Add table height and tool rotation
+    point.insert(point.end(), pickupHeight.begin(), pickupHeight.end()); // Add table height and tool rotation
 
     // Make hover point, to avoid collision
     vector<double> hoverPoint = point;
-    hoverPoint[2] += 0.2;
+    hoverPoint[2] += 0.1;
 
     // Hover over point
-    rtdeControl->moveL(hoverPoint);
+    rtdeControl->moveL(hoverPoint, velocity);
 
     // Open gripper
     gripper->open();
@@ -224,23 +235,23 @@ bool RobotArm::pickUp(string color, vector<double> point) {
     gripper->close();
 
     // Hover over point
-    rtdeControl->moveL(hoverPoint, _velocity);
+    rtdeControl->moveL(hoverPoint, velocity);
     pickStatus = gripper->pickup();
 
     // If no MM in gripper abort
     if (!pickStatus) {
-        rtdeControl->moveL(basePos);
+        rtdeControl->moveL(basePos, velocity);
         return false;
     }
 
     // Go to drop_point
-    rtdeControl->moveL(dropPoints[color]);
+    rtdeControl->moveL(dropPoints[color], velocity);
 
     // Open gripper
     gripper->open();
 
     // Go to base position
-    rtdeControl->moveL(basePos);
+    rtdeControl->moveL(basePos, velocity);
 
     return true;
 }
