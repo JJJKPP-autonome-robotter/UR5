@@ -2,16 +2,14 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-
-
-
-#include "../headers/systemInit.hpp"
-
-#include "../headers/MainWindow.hpp"
-
 #include <QApplication>
 #include <QTimer>
 #include <thread>
+
+#include "../headers/systemInit.hpp"
+#include "../headers/MainWindow.hpp"
+
+
 
 using namespace std;
 
