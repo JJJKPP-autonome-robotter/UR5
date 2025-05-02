@@ -56,7 +56,7 @@ void PixelToRobot::detectContours() {  // Renamed from findContours
     findContours(mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);  // RETR_EXTERNAL = only external contours
                                                                        // CHAIN_APPROX_SIMPLE removes redundant points
 
-    const double minArea = 5000.0;  // contour less than 6000 pixels ignored
+    const double minArea = 3000.0;  // contour less than 6000 pixels ignored
     const double maxArea = 10000.0;
 
     centers.clear();
