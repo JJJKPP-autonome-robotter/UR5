@@ -43,11 +43,8 @@ qmake6 --version
 ```
 
 ### Robot setup
-To control the robot over Ethernet. Make sure to install the URCap External Control.<br>
-For installation guid see the [URCap installtion.](https://github.com/UniversalRobots/Universal_Robots_ROS_Driver/blob/master/ur_robot_driver/doc/install_urcap_e_series.md)<br>
+make sure remotecontrol is eneabled on the robot. Get the IP of the robot, and update the config.yaml with the IP of the robot.
 
-Create a program on the robot which runs the External Control.<br>
-For the External Control, enter the Host IP, local IP for the computer which the remote connection is made with.
 
 ### Network setup
 On the robot, under External Control, set the Host IP to the local IP of the connected PC.<br>
