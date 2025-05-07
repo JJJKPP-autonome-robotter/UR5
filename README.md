@@ -43,15 +43,10 @@ qmake6 --version
 ```
 
 ### Robot setup
-make sure remotecontrol is eneabled on the robot. Get the IP of the robot, and update the config.yaml with the IP of the robot.
+make sure remotecontrol is eneabled on the robot. Get the IP of the robot, and update the config.yaml with the IP of the robot.<br>
 
 
 ### Network setup
-On the robot, under External Control, set the Host IP to the local IP of the connected PC.<br>
-**To find your local IP run:**<br>
-```bash
-ifconfig
-```
 Look for the IP under the Ethernet adapter, should look like 192.168.xxx.xxx<br>
 If no IP is assigned for the ethernet adapter, run the following commands to add it.<br>
 **Add new local ip:**<br>
