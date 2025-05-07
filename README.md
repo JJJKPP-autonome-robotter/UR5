@@ -6,7 +6,7 @@ Guid to setting up the robot and needed librarys.<br>
 
 ### RTDE Library
 Install the RTDE library for C++ By Anders Prier Lindvig.<br>
-Library and guid at for installation at [RTDE library.](https://gitlab.com/sdurobotics/ur_rtde)<br>
+Library and guid for installation at [RTDE library.](https://gitlab.com/sdurobotics/ur_rtde)<br>
 
 ### OpenCV Library
 Install OpenCV Development Package: <br>
@@ -69,7 +69,7 @@ ip link show
 ```bash
 sudo ip link set "Ethernet adapter" up
 ```
-It should now show under ifconfig, and you can now tell the robot what the host IP is.
+It should now show under ifconfig, and you should now be able to control the robot.
 
 
 
