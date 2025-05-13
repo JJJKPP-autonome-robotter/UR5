@@ -249,5 +249,5 @@ def main(db_path):
     show_run_details(events_data)
 
 if __name__ == "__main__":
-    db_path = "data_log.db"
+    db_path = "data_log_05_15.db"
     main(db_path)
