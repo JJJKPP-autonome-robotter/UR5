@@ -13,15 +13,18 @@
 using namespace std;
 
 void mainLoop(bool dbActive, DataLogger& db) {
-    vector<string> selectedColors = cfg.get<vector<string>>("cvCfg", "colorToPick");
+    
 
     while (true) {
-        pair<Point, string> target = captureAndProcess(selectedColors);
+        vector<string> selectedColors = cfg.get<vector<string>>("cvCfg", "colorToPick"); // get the selected colors
 
-        Point mmCenter = target.first;
-        string color = target.second;
+        pair<Point, string> target = captureAndProcess(selectedColors); // detect the target
+
+        Point mmCenter = target.first; // extract the point
+        string color = target.second; // extract the color
 
 
+        // check if the target is valid
         if (color.empty() || mmCenter.x == 0 || mmCenter.y == 0) {
             cerr << "Invalid target detected" << endl;
             continue;
@@ -32,10 +35,12 @@ void mainLoop(bool dbActive, DataLogger& db) {
         cout << "Pixel (" << mmCenter.x << ", " << mmCenter.y << ") -> "
              << "Robot (" << robotCoord.x << ", " << robotCoord.y << ")" << endl;
 
+        // get the pick point
         vector<double> mm = {robotCoord.x, robotCoord.y};
         bool pickup = false;
         pickup = ur5->pickUp(color, mm);
 
+        // database logging
         if (dbActive) {
             vector<cv::Mat> masks = processor.getMask();
             auto it = find(selectedColors.begin(), selectedColors.end(), color);
@@ -67,6 +72,7 @@ int main(int argc, char *argv[])
     MainWindow gui;
     gui.show();
 
+    // update image every second
     QTimer *timer = new QTimer(&gui);
     QObject::connect(timer, &QTimer::timeout, &gui, &MainWindow::refreshImage);
     timer->start(1000); // 1000 ms = 1 second

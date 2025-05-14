@@ -118,11 +118,11 @@ void ProcessImage::detectContours(const string& color, const vector<Point2f>& ro
     // Create a bounding rectangle from the robot centers
     Rect robotBoundingBox = boundingRect(robotCenters);
 
-    // Make the robotBoundingBox 50 pixels smaller
-    robotBoundingBox.x += 25; // Shift x position by 25 pixels
-    robotBoundingBox.y += 25; // Shift y position by 25 pixels
-    robotBoundingBox.width = max(0, robotBoundingBox.width - 50); // Reduce width by 50 pixels
-    robotBoundingBox.height = max(0, robotBoundingBox.height - 50); // Reduce height by 50 pixels
+    // Make the robotBoundingBox 100 pixels smaller
+    robotBoundingBox.x += 50; // Shift x position by 50 pixels
+    robotBoundingBox.y += 50; // Shift y position by 50 pixels
+    robotBoundingBox.width = max(0, robotBoundingBox.width - 100); // Reduce width by 100 pixels
+    robotBoundingBox.height = max(0, robotBoundingBox.height - 100); // Reduce height by 100 pixels
 
     for (const auto& contour : contours) {
         double area = contourArea(contour);
